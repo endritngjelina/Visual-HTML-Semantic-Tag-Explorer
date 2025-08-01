@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Semantic Tag Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #007AFF;
+            --secondary: #5856D6;
+            --success: #30D158;
+            --warning: #FF9F0A;
+            --error: #FF3B30;
+            --bg-primary: #000000;
+            --bg-secondary: #1C1C1E;
+            --bg-tertiary: #2C2C2E;
+            --text-primary: #FFFFFF;
+            --text-secondary: #EBEBF5;
+            --text-tertiary: #EBEBF599;
+            --border: #38383A;
+            --glass: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: radial-gradient(circle at 50% 50%, var(--primary) 0%, transparent 50%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            z-index: 2;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: fadeInUp 1s ease-out 0.4s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 122, 255, 0.3);
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .explorer-section {
+            min-height: 100vh;
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tag-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .tag-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .tag-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .tag-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .tag-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .tag-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .tag-usage {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            color: var(--success);
+            border-left: 4px solid var(--primary);
+        }
+
+        .demo-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .demo-content {
+            width: 95%;
+            height: 95%;
+            margin: 2.5%;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .demo-header {
+            background: var(--bg-tertiary);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .demo-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: var(--error);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
+        }
+
+        .demo-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .code-panel, .visual-panel {
+            flex: 1;
+            padding: 2rem;
+            overflow: auto;
+        }
+
+        .code-panel {
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border);
+        }
+
+        .visual-panel {
+            background: var(--bg-secondary);
+        }
+
+        .code-block {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 1.5rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .code-block::before {
+            content: 'HTML';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .visual-demo {
+            background: white;
+            color: #333;
+            border-radius: 10px;
+            padding: 2rem;
+            min-height: 300px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visual-demo::before {
+            content: 'Visual Preview';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: var(--success);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .syntax-highlight .tag { color: #e06c75; }
+        .syntax-highlight .attr { color: #d19a66; }
+        .syntax-highlight .string { color: #98c379; }
+        .syntax-highlight .comment { color: #5c6370; font-style: italic; }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0.3;
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 122, 255, 0.3);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            from { transform: translateY(100vh) rotate(0deg); }
+            to { transform: translateY(-100px) rotate(360deg); }
+        }
+
+        .accessibility-info {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border-left: 4px solid var(--success);
+        }
+
+        .accessibility-title {
+            color: var(--success);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .demo-body {
+                flex-direction: column;
+            }
+            
+            .code-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .tag-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements" id="floatingElements"></div>
+    
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Semantic HTML Explorer</h1>
+            <p>Master the art of semantic markup with interactive demos</p>
+            <button class="cta-button" onclick="scrollToExplorer()">
+                Start Exploring
+            </button>
+        </div>
+    </section>
+
+    <section class="explorer-section">
+        <div class="container">
+            <h2 class="section-title">Interactive Tag Explorer</h2>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search semantic tags..." id="searchInput" oninput="filterTags()">
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Visual Learning</h3>
+                    <p>See how semantic tags structure content with live visual demonstrations</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Interactive Demos</h3>
+                    <p>Explore side-by-side code and visual previews with smooth animations</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">♿</div>
+                    <h3>Accessibility Focus</h3>
+                    <p>Learn how semantic HTML improves accessibility and screen reader support</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>SEO Benefits</h3>
+                    <p>Understand how semantic markup enhances search engine optimization</p>
+                </div>
+            </div>
+            
+            <div class="tag-grid" id="tagGrid">
+                <!-- Tags will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <div class="demo-container" id="demoContainer">
+        <div class="demo-content">
+            <div class="demo-header">
+                <h3 class="demo-title" id="demoTitle"></h3>
+                <button class="close-btn" onclick="closeDemo()" aria-label="Close demo">&times;</button>
+            </div>
+            <div class="demo-body">
+                <div class="code-panel">
+                    <div class="tab-container">
+                        <button class="tab-btn active" onclick="switchTab('html')">HTML</button>
+                        <button class="tab-btn" onclick="switchTab('accessibility')">Accessibility</button>
+                        <button class="tab-btn" onclick="switchTab('seo')">SEO Impact</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="htmlTab">
+                        <div class="code-block syntax-highlight" id="codeContent"></div>
+                    </div>
+                    
+                    <div class="tab-content" id="accessibilityTab">
+                        <div class="accessibility-info">
+                            <div class="accessibility-title">
+                                ♿ Accessibility Benefits
+                            </div>
+                            <div id="accessibilityContent"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="seoTab">
+                        <div class="accessibility-info" style="border-left-color: var(--warning);">
+                            <div class="accessibility-title" style="color: var(--warning);">
+                                🔍 SEO Impact
+                            </div>
+                            <div id="seoContent"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="visual-panel">
+                    <div class="visual-demo" id="visualDemo"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Semantic tags data
+        const semanticTags = [
+            {
+                name: '<header>',
+                description: 'Represents introductory content, typically containing navigation aids, logos, or heading elements.',
+                usage: '<header>\n  <h1>Site Title</h1>\n  <nav>...</nav>\n</header>',
+                demo: `
+                    <header style="background: #f0f8ff; padding: 20px; border-radius: 8px; border: 2px solid #007AFF;">
+                        <h1 style="color: #007AFF; margin: 0;">Welcome to Our Site</h1>
+                        <nav style="margin-top: 10px;">
+                            <a href="#" style="margin-right: 15px; color: #007AFF;">Home</a>
+                            <a href="#" style="margin-right: 15px; color: #007AFF;">About</a>
+                            <a href="#" style="color: #007AFF;">Contact</a>
+                        </nav>
+                    </header>
+                `,
+                accessibility: 'Screen readers can identify the page header and skip to main content. Provides structural navigation landmarks.',
+                seo: 'Search engines recognize this as the primary header containing important site information and navigation.'
+            },
+            {
+                name: '<nav>',
+                description: 'Defines a section containing navigation links to other pages or sections within the current page.',
+                usage: '<nav>\n  <ul>\n    <li><a href="/">Home</a></li>\n    <li><a href="/about">About</a></li>\n  </ul>\n</nav>',
+                demo: `
+                    <nav style="background: #f5f5f7; padding: 15px; border-radius: 8px; border: 2px solid #5856D6;">
+                        <ul style="list-style: none; margin: 0; padding: 0; display: flex; gap: 20px;">
+                            <li><a href="#" style="color: #5856D6; text-decoration: none; font-weight: 500;">Home</a></li>
+                            <li><a href="#" style="color: #5856D6; text-decoration: none; font-weight: 500;">Products</a></li>
+                            <li><a href="#" style="color: #5856D6; text-decoration: none; font-weight: 500;">Services</a></li>
+                            <li><a href="#" style="color: #5856D6; text-decoration: none; font-weight: 500;">Contact</a></li>
+                        </ul>
+                    </nav>
+                `,
+                accessibility: 'Creates a navigation landmark that assistive technologies can jump to directly. Users can skip navigation if needed.',
+                seo: 'Helps search engines understand site structure and creates clear pathways for crawling linked pages.'
+            },
+            {
+                name: '<main>',
+                description: 'Represents the dominant content of the body. There should be only one main element per page.',
+                usage: '<main>\n  <h1>Page Title</h1>\n  <p>Main content...</p>\n</main>',
+                demo: `
+                    <main style="background: #fff; padding: 30px; border-radius: 8px; border: 2px solid #30D158; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <h1 style="color: #30D158; margin-top: 0;">Main Content Area</h1>
+                        <p style="color: #333; line-height: 1.6;">This is the primary content of the page. It contains the most important information that users are looking for.</p>
+                        <article style="margin-top: 20px; padding: 15px; background: #f0fff4; border-left: 4px solid #30D158;">
+                            <h2 style="color: #30D158; margin-top: 0;">Featured Article</h2>
+                            <p style="color: #333;">This article contains valuable information for our readers.</p>
+                        </article>
+                    </main>
+                `,
+                accessibility: 'Provides a "skip to main content" target for screen readers, improving navigation efficiency.',
+                seo: 'Clearly identifies the primary content, helping search engines focus on the most important page information.'
+            },
+            {
+                name: '<section>',
+                description: 'Represents a generic standalone section of content that would typically have a heading.',
+                usage: '<section>\n  <h2>Section Title</h2>\n  <p>Section content...</p>\n</section>',
+                demo: `
+                    <section style="background: #fff3cd; padding: 25px; border-radius: 8px; border: 2px solid #FF9F0A; margin-bottom: 20px;">
+                        <h2 style="color: #FF9F0A; margin-top: 0;">Our Services</h2>
+                        <p style="color: #333;">We offer a comprehensive range of professional services to meet your needs.</p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                            <div style="background: white; padding: 15px; border-radius: 6px; text-align: center;">
+                                <strong style="color: #FF9F0A;">Web Design</strong>
+                            </div>
+                            <div style="background: white; padding: 15px; border-radius: 6px; text-align: center;">
+                                <strong style="color: #FF9F0A;">Development</strong>
+                            </div>
+                            <div style="background: white; padding: 15px; border-radius: 6px; text-align: center;">
+                                <strong style="color: #FF9F0A;">Consulting</strong>
+                            </div>
+                        </div>
+                    </section>
+                `,
+                accessibility: 'Creates logical document sections that screen readers can navigate between systematically.',
+                seo: 'Helps organize content into thematic sections, making it easier for search engines to understand page structure.'
+            },
+            {
+                name: '<article>',
+                description: 'Represents a self-contained composition that could be distributed independently.',
+                usage: '<article>\n  <h2>Article Title</h2>\n  <p>Article content...</p>\n</article>',
+                demo: `
+                    <article style="background: white; padding: 25px; border-radius: 8px; border: 2px solid #007AFF; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <header style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">
+                            <h2 style="color: #007AFF; margin: 0;">The Future of Web Development</h2>
+                            <p style="color: #666; margin: 5px 0 0 0; font-size: 0.9em;">Published on March 15, 2024 by Jane Developer</p>
+                        </header>
+                        <p style="color: #333; line-height: 1.6;">Web development continues to evolve at a rapid pace. New technologies and frameworks emerge regularly, offering developers more powerful tools to create amazing user experiences.</p>
+                        <footer style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; color: #666; font-size: 0.9em;">
+                            Tags: <span style="color: #007AFF;">#webdev #technology #future</span>
+                        </footer>
+                    </article>
+                `,
+                accessibility: 'Screen readers can identify and navigate between independent articles, improving content consumption.',
+                seo: 'Search engines can identify standalone content pieces, potentially featuring them in rich results or article carousels.'
+            },
+            {
+                name: '<aside>',
+                description: 'Represents content aside from the main content, like sidebars, callouts, or related information.',
+                usage: '<aside>\n  <h3>Related Links</h3>\n  <ul>...</ul>\n</aside>',
+                demo: `
+                    <div style="display: flex; gap: 20px;">
+                        <main style="flex: 2; background: white; padding: 20px; border-radius: 8px;">
+                            <h2 style="margin-top: 0; color: #333;">Main Article Content</h2>
+                            <p style="color: #666;">This is the primary content that users are reading...</p>
+                        </main>
+                        <aside style="flex: 1; background: #f8f9fa; padding: 20px; border-radius: 8px; border: 2px solid #6C757D;">
+                            <h3 style="margin-top: 0; color: #6C757D;">Related Articles</h3>
+                            <ul style="color: #333; padding-left: 20px;">
+                                <li style="margin-bottom: 8px;"><a href="#" style="color: #6C757D;">Understanding CSS Grid</a></li>
+                                <li style="margin-bottom: 8px;"><a href="#" style="color: #6C757D;">JavaScript Best Practices</a></li>
+                                <li><a href="#" style="color: #6C757D;">Responsive Design Tips</a></li>
+                            </ul>
+                        </aside>
+                    </div>
+                `,
+                accessibility: 'Clearly separates complementary content from main content, allowing users to focus on primary information.',
+                seo: 'Indicates supporting content that provides additional context but isn\'t the main focus of the page.'
+            },
+            {
+                name: '<footer>',
+                description: 'Represents footer information for its nearest sectioning content or sectioning root element.',
+                usage: '<footer>\n  <p>&copy; 2024 Company Name</p>\n  <nav>...</nav>\n</footer>',
+                demo: `
+                    <footer style="background: #2c2c2e; color: white; padding: 30px; border-radius: 8px; border: 2px solid #5856D6;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 20px;">
+                            <div>
+                                <h4 style="color: #5856D6; margin-top: 0;">Company</h4>
+                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                    <li style="margin-bottom: 8px;"><a href="#" style="color: #ccc; text-decoration: none;">About Us</a></li>
+                                    <li style="margin-bottom: 8px;"><a href="#" style="color: #ccc; text-decoration: none;">Careers</a></li>
+                                    <li><a href="#" style="color: #ccc; text-decoration: none;">Contact</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 style="color: #5856D6; margin-top: 0;">Legal</h4>
+                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                    <li style="margin-bottom: 8px;"><a href="#" style="color: #ccc; text-decoration: none;">Privacy Policy</a></li>
+                                    <li><a href="#" style="color: #ccc; text-decoration: none;">Terms of Service</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p style="text-align: center; color: #ccc; margin: 0; padding-top: 20px; border-top: 1px solid #38383a;">
+                            &copy; 2024 Semantic HTML Explorer. All rights reserved.
+                        </p>
+                    </footer>
+                `,
+                accessibility: 'Provides a clear landmark for supplementary information and navigation at the end of content.',
+                seo: 'Helps search engines identify important site-wide information like copyright and legal pages.'
+            },
+            {
+                name: '<figure>',
+                description: 'Represents self-contained content, often with a caption, like images, diagrams, illustrations, etc.',
+                usage: '<figure>\n  <img src="image.jpg" alt="Description">\n  <figcaption>Caption text</figcaption>\n</figure>',
+                demo: `
+                    <figure style="max-width: 400px; margin: 0 auto; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd; text-align: center;">
+                        <img src="https://via.placeholder.com/400x200?text=Semantic+HTML" alt="Semantic HTML diagram" style="width: 100%; border-radius: 6px;">
+                        <figcaption style="margin-top: 10px; color: #666; font-style: italic;">
+                            Semantic HTML structure enhances accessibility and SEO
+                        </figcaption>
+                    </figure>
+                `,
+                accessibility: 'Associates media content with its caption, making it clear for screen reader users.',
+                seo: 'Helps search engines understand the relationship between images and their captions.'
+            },
+            {
+                name: '<time>',
+                description: 'Represents a specific period in time. May include a datetime attribute for machine-readable format.',
+                usage: '<time datetime="2024-03-15">March 15, 2024</time>',
+                demo: `
+                    <div style="background: #f0f8ff; padding: 20px; border-radius: 8px; border: 1px solid #007AFF; text-align: center;">
+                        <p style="margin: 0; color: #333;">Article published on 
+                            <time datetime="2024-03-15" style="color: #007AFF; font-weight: 500;">March 15, 2024</time>
+                        </p>
+                    </div>
+                `,
+                accessibility: 'Provides machine-readable date/time information for screen readers and other assistive technologies.',
+                seo: 'Helps search engines understand the temporal context of content.'
+            }
+        ];
+
+        // DOM Elements
+        const tagGrid = document.getElementById('tagGrid');
+        const demoContainer = document.getElementById('demoContainer');
+        const demoTitle = document.getElementById('demoTitle');
+        const codeContent = document.getElementById('codeContent');
+        const visualDemo = document.getElementById('visualDemo');
+        const accessibilityContent = document.getElementById('accessibilityContent');
+        const seoContent = document.getElementById('seoContent');
+        const searchInput = document.getElementById('searchInput');
+        const floatingElements = document.getElementById('floatingElements');
+
+        // Initialize the application
+        function init() {
+            createFloatingElements();
+            populateTagGrid();
+            addEventListeners();
+        }
+
+        // Create floating background elements
+        function createFloatingElements() {
+            const containerWidth = window.innerWidth;
+            const containerHeight = window.innerHeight;
+            
+            // Create 15 floating elements
+            for (let i = 0; i < 15; i++) {
+                const element = document.createElement('div');
+                element.classList.add('floating-element');
+                
+                // Random size between 20px and 80px
+                const size = Math.floor(Math.random() * 60) + 20;
+                element.style.width = `${size}px`;
+                element.style.height = `${size}px`;
+                
+                // Random position
+                const left = Math.random() * containerWidth;
+                element.style.left = `${left}px`;
+                
+                // Random animation duration between 10s and 30s
+                const duration = Math.floor(Math.random() * 20) + 10;
+                element.style.animationDuration = `${duration}s`;
+                
+                // Random delay
+                const delay = Math.random() * 20;
+                element.style.animationDelay = `-${delay}s`;
+                
+                floatingElements.appendChild(element);
+            }
+        }
+
+        // Populate the tag grid with cards
+        function populateTagGrid() {
+            tagGrid.innerHTML = '';
+            
+            semanticTags.forEach(tag => {
+                const tagCard = document.createElement('div');
+                tagCard.classList.add('tag-card');
+                tagCard.innerHTML = `
+                    <div class="tag-name">${tag.name}</div>
+                    <div class="tag-description">${tag.description}</div>
+                    <div class="tag-usage">${tag.usage}</div>
+                `;
+                tagCard.addEventListener('click', () => showDemo(tag));
+                tagGrid.appendChild(tagCard);
+            });
+        }
+
+        // Filter tags based on search input
+        function filterTags() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const tagCards = document.querySelectorAll('.tag-card');
+            let hasResults = false;
+            
+            tagCards.forEach(card => {
+                const tagName = card.querySelector('.tag-name').textContent.toLowerCase();
+                const tagDesc = card.querySelector('.tag-description').textContent.toLowerCase();
+                
+                if (tagName.includes(searchTerm) || tagDesc.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Show no results message if needed
+            const noResults = document.querySelector('.no-results');
+            if (!hasResults) {
+                if (!noResults) {
+                    const noResultsEl = document.createElement('div');
+                    noResultsEl.classList.add('no-results');
+                    noResultsEl.textContent = 'No tags match your search. Try a different term.';
+                    tagGrid.appendChild(noResultsEl);
+                }
+            } else if (noResults) {
+                noResults.remove();
+            }
+        }
+
+        // Show demo for a specific tag
+        function showDemo(tag) {
+            demoTitle.textContent = tag.name;
+            codeContent.textContent = tag.usage;
+            visualDemo.innerHTML = tag.demo;
+            accessibilityContent.textContent = tag.accessibility;
+            seoContent.textContent = tag.seo;
+            demoContainer.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Apply syntax highlighting
+            applySyntaxHighlighting();
+        }
+
+        // Apply syntax highlighting to code
+        function applySyntaxHighlighting() {
+            const code = codeContent.textContent;
+            let highlighted = code
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/(".*?")/g, '<span class="string">$1</span>')
+                .replace(/(&lt;\/?[a-z]+)/gi, '<span class="tag">$1</span>')
+                .replace(/( [a-z-]+=)/gi, '<span class="attr">$1</span>');
+            
+            codeContent.innerHTML = highlighted;
+        }
+
+        // Close the demo
+        function closeDemo() {
+            demoContainer.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Switch between tabs
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabId}Tab`).classList.add('active');
+            
+            // Activate clicked button
+            event.target.classList.add('active');
+        }
+
+        // Scroll to explorer section
+        function scrollToExplorer() {
+            document.querySelector('.explorer-section').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Add event listeners
+        function addEventListeners() {
+            // Close demo with escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && demoContainer.style.display === 'block') {
+                    closeDemo();
+                }
+            });
+            
+            // Close demo when clicking outside content
+            demoContainer.addEventListener('click', (e) => {
+                if (e.target === demoContainer) {
+                    closeDemo();
+                }
+            });
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
