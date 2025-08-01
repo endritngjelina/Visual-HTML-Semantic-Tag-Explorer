@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual HTML Semantic Tag Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+            transition: background 0.5s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .tag-btn {
+            padding: 12px 24px;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .tag-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .tag-btn:focus {
+            outline: 2px solid rgba(255, 255, 255, 0.5);
+            outline-offset: 2px;
+        }
+
+        .tag-btn.active {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            box-shadow: 0 8px 25px rgba(238,90,36,0.3);
+            transform: translateY(-2px);
+        }
+
+        .explorer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+        }
+
+        .panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .visual-demo {
+            min-height: 400px;
+            border: 2px dashed #e0e6ed;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #f8f9fa 75%), 
+                        linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            transition: opacity 0.3s ease;
+        }
+
+        .code-view {
+            background: #1e1e1e;
+            border-radius: 15px;
+            padding: 20px;
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+            position: relative;
+            transition: opacity 0.3s ease;
+        }
+
+        .code-view::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: #2d2d2d;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .code-view::after {
+            content: '● ● ●';
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            color: #ff5f57;
+            font-size: 12px;
+            letter-spacing: 5px;
+        }
+
+        .code-content {
+            margin-top: 30px;
+            color: #d4d4d4;
+        }
+
+        .info-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.3);
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .info-card {
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(102,126,234,0.3);
+        }
+
+        .info-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demo-element {
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .demo-element.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .syntax-highlight .tag { color: #569cd6; }
+        .syntax-highlight .attr { color: #9cdcfe; }
+        .syntax-highlight .value { color: #ce9178; }
+        .syntax-highlight .text { color: #d4d4d4; }
+        .syntax-highlight .comment { color: #6a9955; font-style: italic; }
+
+        .feature-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-item {
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .feature-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-5px);
+        }
+
+        .accessibility-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: #27ae60;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+
+        .semantic-structure {
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            margin: 10px 0;
+            padding: 15px;
+            position: relative;
+            background: rgba(52, 152, 219, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .semantic-structure:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52,152,219,0.3);
+        }
+
+        .semantic-structure::before {
+            content: attr(data-tag);
+            position: absolute;
+            top: -12px;
+            left: 10px;
+            background: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            animation: fadeInUp 0.3s ease-out;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-notification::before {
+            content: "✓";
+            font-weight: bold;
+        }
+
+        .tag-description {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(102,126,234,0.1);
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.5s ease;
+        }
+
+        .tag-description h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #3a3a3a;
+            color: #d4d4d4;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            z-index: 20;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #4a4a4a;
+        }
+
+        .keyboard-hint {
+            text-align: center;
+            margin-top: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        body.dark-mode .panel,
+        body.dark-mode .info-section {
+            background: rgba(30, 30, 46, 0.95);
+            color: #e6e6e6;
+        }
+
+        body.dark-mode .panel h2,
+        body.dark-mode .tag-description h3 {
+            color: #a0a0d8;
+        }
+
+        body.dark-mode .tag-description {
+            background: rgba(74, 78, 105, 0.2);
+            border-left-color: #6c63ff;
+        }
+
+        body.dark-mode .info-card {
+            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+        }
+
+        body.dark-mode .feature-item {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .tag-btn {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .tag-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark-mode .tag-btn.active {
+            background: linear-gradient(135deg, #ff7b6b, #ff9a24);
+        }
+
+        @media (max-width: 768px) {
+            .explorer-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+            
+            .tag-btn {
+                padding: 10px 16px;
+                font-size: 12px;
+            }
+            
+            .visual-demo {
+                min-height: 300px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .tag-btn {
+                padding: 8px 14px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Visual HTML Semantic Tag Explorer</h1>
+            <p>Discover the power and meaning of semantic HTML tags through interactive visualizations and real-time code examples</p>
+        </header>
+
+        <div class="controls">
+            <button class="tag-btn active" data-tag="section">Section</button>
+            <button class="tag-btn" data-tag="article">Article</button>
+            <button class="tag-btn" data-tag="header">Header</button>
+            <button class="tag-btn" data-tag="nav">Navigation</button>
+            <button class="tag-btn" data-tag="main">Main</button>
+            <button class="tag-btn" data-tag="aside">Aside</button>
+            <button class="tag-btn" data-tag="footer">Footer</button>
+            <button class="tag-btn" data-tag="figure">Figure</button>
+        </div>
+        
+        <div class="keyboard-hint">
+            <p>Press 1-8 to navigate between tags | Ctrl+D to toggle dark mode</p>
+        </div>
+
+        <div class="explorer-grid">
+            <div class="panel">
+                <h2>
+                    <div class="panel-icon">👁</div>
+                    Visual Demo
+                </h2>
+                <div class="visual-demo" id="visualDemo">
+                    <div class="accessibility-indicator" role="img" aria-label="Accessibility Enhanced">♿</div>
+                </div>
+                <div id="tagDescription"></div>
+            </div>
+
+            <div class="panel">
+                <h2>
+                    <div class="panel-icon">&lt;/&gt;</div>
+                    HTML Code
+                </h2>
+                <div class="code-view">
+                    <button class="copy-btn" id="copyBtn">Copy</button>
+                    <div class="code-content syntax-highlight" id="codeContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50; font-size: 2rem;">Semantic HTML Benefits</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>🎯 SEO Optimization</h3>
+                    <p>Search engines better understand your content structure, leading to improved rankings and rich snippets in search results.</p>
+                </div>
+                <div class="info-card">
+                    <h3>♿ Accessibility</h3>
+                    <p>Screen readers and assistive technologies can navigate your content more effectively, making your site inclusive for all users.</p>
+                </div>
+                <div class="info-card">
+                    <h3>🔧 Maintainability</h3>
+                    <p>Clean, semantic code is easier to read, debug, and maintain by development teams, reducing long-term costs.</p>
+                </div>
+                <div class="info-card">
+                    <h3>📱 Future-Proof</h3>
+                    <p>Semantic markup adapts better to new devices and technologies, ensuring your content remains accessible across platforms.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-showcase">
+            <div class="feature-item">
+                <h3>🎨 Interactive Demos</h3>
+                <p>See how each tag works in real-time</p>
+            </div>
+            <div class="feature-item">
+                <h3>📝 Syntax Highlighting</h3>
+                <p>Professional code formatting</p>
+            </div>
+            <div class="feature-item">
+                <h3>📊 Structure Visualization</h3>
+                <p>Understand document hierarchy</p>
+            </div>
+            <div class="feature-item">
+                <h3>⚡ Performance Optimized</h3>
+                <p>Smooth animations and transitions</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const semanticTags = {
+            section: {
+                description: "The <section> element represents a thematic grouping of content with a heading. It's perfect for chapters, tabs, or distinct content areas.",
+                demo: `
+                    <div class="semantic-structure demo-element" data-tag="SECTION">
+                        <h2 style="color: #2c3e50; margin-bottom: 15px;">About Our Company</h2>
+                        <p style="margin-bottom: 10px;">We are a leading technology company focused on innovation and user experience.</p>
+                        <p>Our mission is to create products that make a difference in people's lives.</p>
+                    </div>
+                    <div class="semantic-structure demo-element" data-tag="SECTION">
+                        <h2 style="color: #2c3e50; margin-bottom: 15px;">Our Services</h2>
+                        <p>We provide cutting-edge solutions for modern businesses.</p>
+                    </div>
+                `,
+                code: `<span class="tag">&lt;section&gt;</span>
+  <span class="tag">&lt;h2&gt;</span><span class="text">About Our Company</span><span class="tag">&lt;/h2&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="text">We are a leading technology company...</span><span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="text">Our mission is to create products...</span><span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/section&gt;</span>
+
+<span class="tag">&lt;section&gt;</span>
+  <span class="tag">&lt;h2&gt;</span><span class="text">Our Services</span><span class="tag">&lt;/h2&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="text">We provide cutting-edge solutions...</span><span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/section&gt;</span>`,
+                rawCode: `<section>
+  <h2>About Our Company</h2>
+  <p>We are a leading technology company...</p>
+  <p>Our mission is to create products...</p>
+</section>
+
+<section>
+  <h2>Our Services</h2>
+  <p>We provide cutting-edge solutions...</p>
+</section>`
+            },
+            article: {
+                description: "The <article> element represents a complete, self-contained piece of content that could be distributed independently, such as blog posts or news articles.",
+                demo: `
+                    <div class="semantic-structure demo-element" data-tag="ARTICLE">
+                        <h1 style="color: #e74c3c; margin-bottom: 10px;">The Future of Web Development</h1>
+                        <p style="font-size: 12px; color: #7f8c8d; margin-bottom: 15px;">Published on March 15, 2024 by Jane Doe</p>
+                        <p style="margin-bottom: 10px;">Web development continues to evolve at a rapid pace, with new frameworks and technologies emerging regularly.</p>
+                        <p>This comprehensive guide explores the trends shaping the future of our industry.</p>
+                    </div>
+                `,
+                code: `<span class="tag">&lt;article&gt;</span>
+  <span class="tag">&lt;h1&gt;</span><span class="text">The Future of Web Development</span><span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;p <span class="attr">class</span>=<span class="value">"meta"</span>&gt;</span><span class="text">Published on March 15, 2024</span><span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="text">Web development continues to evolve...</span><span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="text">This comprehensive guide explores...</span><span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/article&gt;</span>`,
+                rawCode: `<article>
+  <h1>The Future of Web Development</h1>
+  <p class="meta">Published on March 15, 2024</p>
+  <p>Web development continues to evolve...</p>
+  <p>This comprehensive guide explores...</p>
+</article>`
+            },
+            header: {
+                description: "The <header> element represents introductory content or a group of navigational links. It typically contains headings, logos, and navigation elements.",
+                demo: `
+                    <div class="semantic-structure demo-element" data-tag="HEADER">
+                        <h1 style="color: #9b59b6; margin-bottom: 15px; font-size: 24px;">🚀 TechCorp</h1>
+                        <nav style="background: rgba(155,89,182,0.1); padding: 10px; border-radius: 5px;">
+                            <a href="#" style="margin-right: 15px; color: #9b59b6; text-decoration: none;">Home</a>
+                            <a href="#" style="margin-right: 15px; color: #9b59b6; text-decoration: none;">About</a>
+                            <a href="#" style="margin-right: 15px; color: #9b59b6; text-decoration: none;">Services</a>
+                            <a href="#" style="color: #9b59b6; text-decoration: none;">Contact</a>
+                        </nav>
+                    </div>
+                `,
+                code: `<span class="tag">&lt;header&gt;</span>
+  <span class="tag">&lt;h1&gt;</span><span class="text">🚀 TechCorp</span><span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;nav&gt;</span>
+    <span class="tag">&lt;a <span class="attr">href</span>=<span class="value">"#home"</span>&gt;</span><span class="text">Home</span><span class="tag">&lt;/a&gt;</span>
+    <span class="tag">&lt;a <span class="attr">href</span>=<span class="value">"#about"</span>&gt;</span><span class="text">About</span><span class="tag">&lt;/a&gt;</span>
+    <span class="tag">&lt;a <span class="attr">href</span>=<span class="value">"#services"</span>&gt;</span><span class="text">Services</span><span class="tag">&lt;/a&gt;</span>
+    <span class="tag">&lt;a <span class="attr">href</span>=<span class="value">"#contact"</span>&gt;</span><span class="text">Contact</span><span class="tag">&lt;/a&gt;</span>
+  <span class="tag">&lt;/nav&gt;</span>
+<span class="tag">&lt;/header&gt;</span>`,
+                rawCode: `<header>
+  <h1>🚀 TechCorp</h1>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>`
+            },
+            nav: {
+                description: "The <nav> element represents navigation links for the document or section. It helps users and assistive technologies understand site structure.",
+                demo: `
+                    <div class="semantic-structure demo-element" data-tag="NAV">
+                        <h3 style="color: #27ae60; margin-bottom: 15px;">Site Navigation</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: 8px;">🏠 <a href="#" style="color: #27ae60; text-decoration: none;">Dashboard</a></li>
+                            <li style="margin-bottom: 8px;">📊 <a href="#" style="color: #27ae60; text-decoration: none;">Analytics</a></li>
+                            <li style="margin-bottom: 8px;">⚙️ <a href="#" style="color: #27ae60; text-decoration: none;">Settings</a></li>
+                            <li>👤 <a href="#" style="color: #27ae60; text-decoration: none;">Profile</a></li>
+                        </ul>
+                    </div>
+                `,
+                code: `<span class="tag">&lt;nav <span class="attr">aria-label</span>=<span class="value">"Main navigation"</span>&gt;</span>
+  <span class="tag">&lt;ul&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a <span class="attr">href</span>=<span class="value">"/dashboard"</span>&gt;</span><span class="text">Dashboard</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a <span class="attr">href</span>=<span class="value">"/analytics"</span>&gt;</span><span class="text">Analytics</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a <span class="attr">href</span>=<span class="value">"/settings"</span>&gt;</span><span class="text">Settings</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a <span class="attr">href</span>=<span class="value">"/profile"</span>&gt;</span><span class="text">Profile</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+  <span class="tag">&lt;/ul&gt;</span>
+<span class="tag">&lt;/nav&gt;</span>`,
+                rawCode: `<nav aria-label="Main navigation">
+  <ul>
+    <li><a href="/dashboard">Dashboard</a></li>
+    <li><a href="/analytics">Analytics</a></li>
+    <li><a href="/settings">Settings</a></li>
+    <li><a href="/profile">Profile</a></li>
+  </ul>
+</nav>`
+            },
+            main: {
+                description: "The <main> element represents the main content area of the document. There should be only one <main> element per page, excluding headers, footers, and sidebars.",
+                demo: `
+                    <div class="semantic-structure demo-element" data-tag="MAIN">
+                        <h1 style="color: #f39c12; margin-bottom: 20px;">Welcome to Our Platform</h1>
+                        <p style="margin-bottom: 15px; font-size: 16px;">This is the primary content area where users will spend most of their time.</p>
+                        <div style="background: rgba(243,156,18,0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h3 style="color: #f39c12; margin-bottom: 10px;">Featured Content</h3>
+                            <p>Important information and key features are highlighted here.</p>
+                        </div>
+                        <p>The main element helps screen readers and search engines identify your primary content.</p>
+                    </div>
+                `,
+                code: `<span class="tag">&lt;main&gt;</span>
+  <span class="tag">&lt;h1&gt;</span><span class="text">Welcome to Our Platform</span><span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="text">This is the primary content area...</span><span class="tag">&lt;/p&gt;</span>
+  
+  <span class="tag">&lt;section&gt;</span>
+    <span class="tag">&lt;h2&gt;</span><span class="text">Featured Content</span><span class="tag">&lt;/h2&gt;</span>
+    <span class="tag">&lt;p&gt;</span><span class="text">Important information and key features...</span><span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/section&gt;</span>
+  
+  <span class="tag">&lt;p&gt;</span><span class="text">The main element helps screen readers...</span><span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/main&gt;</span>`,
+                rawCode: `<main>
+  <h1>Welcome to Our Platform</h1>
+  <p>This is the primary content area...</p>
+  
+  <section>
+    <h2>Featured Content</h2>
+    <p>Important information and key features...</p>
+  </section>
+  
+  <p>The main element helps screen readers...</p>
+</main>`
+            },
+            aside: {
+                description: "The <aside> element represents content indirectly related to the main content, such as sidebars, pull quotes, or related links.",
+                demo: `
+                    <div class="semantic-structure demo-element" data-tag="ASIDE">
+                        <h3 style="color: #8e44ad; margin-bottom: 15px;">📌 Quick Links</h3>
+                        <ul style="list-style: none; padding: 0; margin-bottom: 20px;">
+                            <li style="margin-bottom: 5px;"><a href="#" style="color: #8e44ad; text-decoration: none;">Documentation</a></li>
+                            <li style="margin-bottom: 5px;"><a href="#" style="color: #8e44ad; text-decoration: none;">API Reference</a></li>
+                            <li style="margin-bottom: 5px;"><a href="#" style="color: #8e44ad; text-decoration: none;">Tutorials</a></li>
+                        </ul>
+                        <div style="background: rgba(142,68,173,0.1); padding: 15px; border-radius: 8px;">
+                            <h4 style="color: #8e44ad; margin-bottom: 10px;">💡 Pro Tip</h4>
+                            <p style="font-size: 14px;">Use semantic HTML to improve your site's accessibility and SEO ranking.</p>
+                        </div>
+                    </div>
+                `,
+                code: `<span class="tag">&lt;aside&gt;</span>
+  <span class="tag">&lt;h3&gt;</span><span class="text">📌 Quick Links</span><span class="tag">&lt;/h3&gt;</span>
+  <span class="tag">&lt;ul&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a <span class="attr">href</span>=<span class="value">"/docs"</span>&gt;</span><span class="text">Documentation</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a <span class="attr">href</span>=<span class="value">"/api"</span>&gt;</span><span class="text">API Reference</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;&lt;a <span class="attr">href</span>=<span class="value">"/tutorials"</span>&gt;</span><span class="text">Tutorials</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+  <span class="tag">&lt;/ul&gt;</span>
+  
+  <span class="tag">&lt;div <span class="attr">class</span>=<span class="value">"tip"</span>&gt;</span>
+    <span class="tag">&lt;h4&gt;</span><span class="text">💡 Pro Tip</span><span class="tag">&lt;/h4&gt;</span>
+    <span class="tag">&lt;p&gt;</span><span class="text">Use semantic HTML to improve...</span><span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/aside&gt;</span>`,
+                rawCode: `<aside>
+  <h3>📌 Quick Links</h3>
+  <ul>
+    <li><a href="/docs">Documentation</a></li>
+    <li><a href="/api">API Reference</a></li>
+    <li><a href="/tutorials">Tutorials</a></li>
+  </ul>
+  
+  <div class="tip">
+    <h4>💡 Pro Tip</h4>
+    <p>Use semantic HTML to improve...</p>
+  </div>
+</aside>`
+            },
+            footer: {
+                description: "The <footer> element represents footer information for its nearest ancestor or the page. It typically contains copyright, contact info, and secondary navigation.",
+                demo: `
+                    <div class="semantic-structure demo-element" data-tag="FOOTER">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 15px;">
+                            <div>
+                                <h4 style="color: #34495e; margin-bottom: 10px;">Company</h4>
+                                <p style="font-size: 12px; margin-bottom: 5px;"><a href="#" style="color: #7f8c8d; text-decoration: none;">About Us</a></p>
+                                <p style="font-size: 12px;"><a href="#" style="color: #7f8c8d; text-decoration: none;">Careers</a></p>
+                            </div>
+                            <div>
+                                <h4 style="color: #34495e; margin-bottom: 10px;">Support</h4>
+                                <p style="font-size: 12px; margin-bottom: 5px;"><a href="#" style="color: #7f8c8d; text-decoration: none;">Help Center</a></p>
+                                <p style="font-size: 12px;"><a href="#" style="color: #7f8c8d; text-decoration: none;">Contact</a></p>
+                            </div>
+                        </div>
+                        <hr style="border: none; height: 1px; background: #bdc3c7; margin: 15px 0;">
+                        <p style="text-align: center; font-size: 12px; color: #7f8c8d;">© 2024 TechCorp. All rights reserved.</p>
+                    </div>
+                `,
+                code: `<span class="tag">&lt;footer&gt;</span>
+  <span class="tag">&lt;div <span class="attr">class</span>=<span class="value">"footer-content"</span>&gt;</span>
+    <span class="tag">&lt;section&gt;</span>
+      <span class="tag">&lt;h4&gt;</span><span class="text">Company</span><span class="tag">&lt;/h4&gt;</span>
+      <span class="tag">&lt;ul&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a <span class="attr">href</span>=<span class="value">"/about"</span>&gt;</span><span class="text">About Us</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a <span class="attr">href</span>=<span class="value">"/careers"</span>&gt;</span><span class="text">Careers</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tag">&lt;/ul&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+    
+    <span class="tag">&lt;section&gt;</span>
+      <span class="tag">&lt;h4&gt;</span><span class="text">Support</span><span class="tag">&lt;/h4&gt;</span>
+      <span class="tag">&lt;ul&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a <span class="attr">href</span>=<span class="value">"/help"</span>&gt;</span><span class="text">Help Center</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a <span class="attr">href</span>=<span class="value">"/contact"</span>&gt;</span><span class="text">Contact</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tag">&lt;/ul&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+  
+  <span class="tag">&lt;p <span class="attr">class</span>=<span class="value">"copyright"</span>&gt;</span><span class="text">© 2024 TechCorp. All rights reserved.</span><span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/footer&gt;</span>`,
+                rawCode: `<footer>
+  <div class="footer-content">
+    <section>
+      <h4>Company</h4>
+      <ul>
+        <li><a href="/about">About Us</a></li>
+        <li><a href="/careers">Careers</a></li>
+      </ul>
+    </section>
+    
+    <section>
+      <h4>Support</h4>
+      <ul>
+        <li><a href="/help">Help Center</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </section>
+  </div>
+  
+  <p class="copyright">© 2024 TechCorp. All rights reserved.</p>
+</footer>`
+            },
+            figure: {
+                description: "The <figure> element represents self-contained content with an optional caption, such as images, diagrams, or code snippets.",
+                demo: `
+                    <div class="semantic-structure demo-element" data-tag="FIGURE">
+                        <div style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); height: 120px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; margin-bottom: 10px;">
+                            📊 Chart Placeholder
+                        </div>
+                        <p style="font-size: 14px; color: #7f8c8d; text-align: center; font-style: italic;">Figure 1: Annual revenue growth showing 25% increase over the past fiscal year</p>
+                    </div>
+                `,
+                code: `<span class="tag">&lt;figure&gt;</span>
+  <span class="tag">&lt;img <span class="attr">src</span>=<span class="value">"revenue-chart.png"</span> <span class="attr">alt</span>=<span class="value">"Revenue growth chart"</span>&gt;</span>
+  <span class="tag">&lt;figcaption&gt;</span>
+    <span class="text">Figure 1: Annual revenue growth showing 25% increase over the past fiscal year</span>
+  <span class="tag">&lt;/figcaption&gt;</span>
+<span class="tag">&lt;/figure&gt;</span>
+
+<span class="comment">&lt;!-- Can also be used for code examples --&gt;</span>
+<span class="tag">&lt;figure&gt;</span>
+  <span class="tag">&lt;pre&gt;&lt;code&gt;</span><span class="text">function greet(name) {
+  return `Hello, ${name}!`;
+}</span><span class="tag">&lt;/code&gt;&lt;/pre&gt;</span>
+  <span class="tag">&lt;figcaption&gt;</span><span class="text">Example: Basic greeting function</span><span class="tag">&lt;/figcaption&gt;</span>
+<span class="tag">&lt;/figure&gt;</span>`,
+                rawCode: `<figure>
+  <img src="revenue-chart.png" alt="Revenue growth chart">
+  <figcaption>
+    Figure 1: Annual revenue growth showing 25% increase over the past fiscal year
+  </figcaption>
+</figure>
+
+<!-- Can also be used for code examples -->
+<figure>
+  <pre><code>function greet(name) {
+  return `Hello, ${name}!`;
+}</code></pre>
+  <figcaption>Example: Basic greeting function</figcaption>
+</figure>`
+            }
+        };
+
+        let currentTag = 'section';
+        let animationTimeout;
+
+        function updateContent(tag) {
+            currentTag = tag;
+            const tagData = semanticTags[tag];
+            
+            // Update visual demo with animation
+            const visualDemo = document.getElementById('visualDemo');
+            const codeContent = document.getElementById('codeContent');
+            const tagDescription = document.getElementById('tagDescription');
+            
+            // Clear previous animation
+            clearTimeout(animationTimeout);
+            
+            // Fade out
+            visualDemo.style.opacity = '0.3';
+            codeContent.style.opacity = '0.3';
+            
+            setTimeout(() => {
+                // Update content
+                visualDemo.innerHTML = `
+                    <div class="accessibility-indicator" role="img" aria-label="Accessibility Enhanced">♿</div>
+                    ${tagData.demo}
+                `;
+                codeContent.innerHTML = tagData.code;
+                tagDescription.innerHTML = `
+                    <div class="tag-description">
+                        <h3>About &lt;${tag}&gt;</h3>
+                        <p>${tagData.description}</p>
+                    </div>
+                `;
+                
+                // Animate demo elements
+                const demoElements = visualDemo.querySelectorAll('.semantic-structure');
+                demoElements.forEach((el, index) => {
+                    el.classList.remove('animate');
+                    setTimeout(() => {
+                        el.classList.add('animate');
+                    }, index * 200);
+                });
+                
+                // Fade in
+                visualDemo.style.opacity = '1';
+                codeContent.style.opacity = '1';
+            }, 300);
+        }
+
+        // Initialize with section tag
+        document.addEventListener('DOMContentLoaded', () => {
+            updateContent('section');
+            
+            // Add click handlers to buttons
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Update active state
+                    document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    // Update content
+                    const tag = e.target.dataset.tag;
+                    updateContent(tag);
+                });
+            });
+            
+            // Add copy button functionality
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.addEventListener('click', () => {
+                const tagData = semanticTags[currentTag];
+                navigator.clipboard.writeText(tagData.rawCode).then(() => {
+                    // Show temporary feedback
+                    const feedback = document.createElement('div');
+                    feedback.className = 'copy-notification';
+                    feedback.textContent = 'Code copied to clipboard!';
+                    document.body.appendChild(feedback);
+                    setTimeout(() => {
+                        feedback.remove();
+                    }, 2000);
+                });
+            });
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '1' && e.key <= '8') {
+                const buttons = document.querySelectorAll('.tag-btn');
+                const index = parseInt(e.key) - 1;
+                if (buttons[index]) {
+                    buttons[index].click();
+                    buttons[index].focus();
+                }
+            }
+            
+            // Theme toggle
+            if (e.key === 'd' && e.ctrlKey) {
+                e.preventDefault();
+                document.body.classList.toggle('dark-mode');
+                
+                // Show theme change notification
+                const themeNotification = document.createElement('div');
+                themeNotification.className = 'copy-notification';
+                themeNotification.textContent = document.body.classList.contains('dark-mode') 
+                    ? 'Dark mode enabled' 
+                    : 'Light mode enabled';
+                document.body.appendChild(themeNotification);
+                setTimeout(() => {
+                    themeNotification.remove();
+                }, 2000);
+            }
+        });
+
+        // Add performance monitoring
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'slideIn 0.8s ease-out';
+                }
+            });
+        });
+
+        document.querySelectorAll('.info-card, .feature-item').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
