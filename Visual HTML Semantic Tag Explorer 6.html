@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual HTML Semantic Tag Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #232f3e;
+            --secondary: #ff9900;
+            --accent: #146eb4;
+            --text-light: #ffffff;
+            --text-dark: #0f1111;
+            --bg-light: #f3f3f3;
+            --bg-card: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-hover: rgba(0, 0, 0, 0.2);
+            --border: #ddd;
+            --success: #067d62;
+            --warning: #b12704;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e8f0fe 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: var(--text-light);
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 20px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(10px) translateY(10px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: slideInDown 1s ease-out;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            animation: slideInUp 1s ease-out 0.3s both;
+        }
+
+        @keyframes slideInDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .controls {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px var(--shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .tag-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tag-button {
+            background: linear-gradient(135deg, var(--bg-card) 0%, #f8f9fa 100%);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+
+        .tag-button:hover::before {
+            animation: shimmer 0.6s ease-in-out;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+        }
+
+        .tag-button:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 40px var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .tag-button.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+            color: var(--text-light);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(20, 110, 180, 0.3);
+        }
+
+        .tag-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px var(--shadow);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+
+        .visual-demo {
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            background: #fafafa;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-view {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 1.5rem;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .code-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .code-tab {
+            background: #333;
+            color: #d4d4d4;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .code-tab.active {
+            background: var(--accent);
+            color: var(--text-light);
+        }
+
+        .copy-btn {
+            background: var(--success);
+            color: var(--text-light);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .copy-btn:hover {
+            background: #048c6c;
+        }
+
+        .syntax-highlight {
+            color: #569cd6;
+        }
+
+        .syntax-string {
+            color: #ce9178;
+        }
+
+        .syntax-tag {
+            color: #4ec9b0;
+        }
+
+        .syntax-attribute {
+            color: #9cdcfe;
+        }
+
+        .syntax-comment {
+            color: #6a9955;
+            font-style: italic;
+        }
+
+        .demo-element {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .highlight-overlay {
+            position: absolute;
+            border: 3px solid var(--secondary);
+            border-radius: 8px;
+            background: rgba(255, 153, 0, 0.1);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .info-panel {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 10px 10px 0;
+            margin-top: 1rem;
+        }
+
+        .info-panel h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .accessibility-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 0.5rem;
+        }
+
+        .accessibility-good { background: var(--success); }
+        .accessibility-warning { background: var(--secondary); }
+        .accessibility-poor { background: var(--warning); }
+
+        .animation-demo {
+            animation: fadeInScale 0.6s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from { 
+                opacity: 0; 
+                transform: scale(0.95);
+            }
+            to { 
+                opacity: 1; 
+                transform: scale(1);
+            }
+        }
+
+        .interactive-element {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .interactive-element:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tag-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>Visual HTML Semantic Tag Explorer</h1>
+            <p>Interactive exploration of semantic HTML elements with live demonstrations</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="controls">
+            <h2>Select a Semantic Tag to Explore</h2>
+            <div class="tag-selector" id="tagSelector">
+                <!-- Tags will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h3>
+                    <span class="panel-icon">👁️</span>
+                    Visual Demonstration
+                </h3>
+                <div class="visual-demo" id="visualDemo">
+                    <p style="text-align: center; color: #666; margin-top: 2rem;">
+                        Select a semantic tag above to see its visual demonstration
+                    </p>
+                </div>
+                <div class="info-panel" id="infoPanel" style="display: none;">
+                    <h4 id="tagTitle">Tag Information</h4>
+                    <p id="tagInfo">Detailed information about the selected tag.</p>
+                    <div class="features-grid" id="featuresGrid">
+                        <!-- Features will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>
+                    <span class="panel-icon">💻</span>
+                    Code View
+                </h3>
+                <div class="code-header">
+                    <div class="code-tabs">
+                        <button class="code-tab active" data-tab="html">HTML</button>
+                        <button class="code-tab" data-tab="css">CSS</button>
+                        <button class="code-tab" data-tab="accessibility">A11y</button>
+                    </div>
+                    <button class="copy-btn" id="copyBtn">📋 Copy</button>
+                </div>
+                <div class="code-view" id="codeView">
+                    <div id="htmlCode" class="code-content">
+                        <span class="syntax-comment"><!-- Select a tag to view its HTML structure --></span>
+                    </div>
+                    <div id="cssCode" class="code-content" style="display: none;">
+                        <span class="syntax-comment">/* CSS styling for the selected element */</span>
+                    </div>
+                    <div id="accessibilityCode" class="code-content" style="display: none;">
+                        <span class="syntax-comment">/* Accessibility considerations and ARIA attributes */</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const semanticTags = {
+            'header': {
+                name: 'header',
+                description: 'Represents introductory content or navigation',
+                accessibility: 'good',
+                demo: `
+                    <header style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 10px; text-align: center; margin-bottom: 1rem;">
+                        <h1 style="margin: 0 0 0.5rem 0; font-size: 2rem;">Welcome to Our Site</h1>
+                        <nav style="margin-top: 1rem;">
+                            <a href="#" style="color: white; text-decoration: none; margin: 0 1rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 20px; transition: all 0.3s;">Home</a>
+                            <a href="#" style="color: white; text-decoration: none; margin: 0 1rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 20px; transition: all 0.3s;">About</a>
+                            <a href="#" style="color: white; text-decoration: none; margin: 0 1rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 20px; transition: all 0.3s;">Contact</a>
+                        </nav>
+                    </header>
+                `,
+                html: `<header>
+  <h1>Welcome to Our Site</h1>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+  </nav>
+</header>`,
+                css: `header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+}
+
+header nav {
+  margin-top: 1rem;
+}
+
+header nav a {
+  color: white;
+  text-decoration: none;
+  margin: 0 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255,255,255,0.2);
+  border-radius: 20px;
+  transition: all 0.3s;
+}
+
+header nav a:hover {
+  background: rgba(255,255,255,0.3);
+}`,
+                accessibility: `/* Accessibility Best Practices for <header> */
+
+header {
+  /* Ensure sufficient color contrast */
+  color: white;
+  background: #667eea; /* Meets WCAG AA standards */
+}
+
+/* Use semantic navigation */
+header nav {
+  /* Screen readers will announce this as navigation */
+}
+
+/* Focus indicators for keyboard navigation */
+header nav a:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* ARIA labels for complex headers */
+header[aria-label="Site header"] {
+  /* Provides context for screen readers */
+}`,
+                info: 'The header element represents introductory content, typically containing navigation aids, logos, or heading elements.',
+                features: [
+                    { title: 'Landmark Role', desc: 'Automatically creates a "banner" landmark for screen readers' },
+                    { title: 'SEO Friendly', desc: 'Search engines recognize header content as important site structure' },
+                    { title: 'Navigation Hub', desc: 'Commonly contains primary navigation elements' }
+                ]
+            },
+            'nav': {
+                name: 'nav',
+                description: 'Defines navigation links and menus',
+                accessibility: 'good',
+                demo: `
+                    <nav style="background: #f8f9fa; padding: 1rem; border-radius: 10px; border: 2px solid #e9ecef;">
+                        <ul style="list-style: none; margin: 0; padding: 0; display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <li><a href="#" style="color: #495057; text-decoration: none; padding: 0.5rem 1rem; border-radius: 5px; background: white; border: 1px solid #dee2e6; transition: all 0.3s;">Dashboard</a></li>
+                            <li><a href="#" style="color: #495057; text-decoration: none; padding: 0.5rem 1rem; border-radius: 5px; background: white; border: 1px solid #dee2e6; transition: all 0.3s;">Products</a></li>
+                            <li><a href="#" style="color: #495057; text-decoration: none; padding: 0.5rem 1rem; border-radius: 5px; background: white; border: 1px solid #dee2e6; transition: all 0.3s;">Analytics</a></li>
+                            <li><a href="#" style="color: #495057; text-decoration: none; padding: 0.5rem 1rem; border-radius: 5px; background: white; border: 1px solid #dee2e6; transition: all 0.3s;">Settings</a></li>
+                        </ul>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #dee2e6;">
+                            <small style="color: #6c757d;">🧭 Navigation Menu - Screen readers will announce this as navigation</small>
+                        </div>
+                    </nav>
+                `,
+                html: `<nav aria-label="Main navigation">
+  <ul>
+    <li><a href="/dashboard">Dashboard</a></li>
+    <li><a href="/products">Products</a></li>
+    <li><a href="/analytics">Analytics</a></li>
+    <li><a href="/settings">Settings</a></li>
+  </ul>
+</nav>`,
+                css: `nav {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: #495057;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  background: white;
+  border: 1px solid #dee2e6;
+  transition: all 0.3s;
+}
+
+nav a:hover,
+nav a:focus {
+  background: #007bff;
+  color: white;
+}`,
+                accessibility: `/* Navigation Accessibility */
+
+/* Always label navigation sections */
+nav[aria-label="Main navigation"] {
+  /* Helps screen readers distinguish between multiple nav elements */
+}
+
+/* Skip links for keyboard users */
+.skip-nav {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #000;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 1000;
+}
+
+.skip-nav:focus {
+  top: 6px;
+}
+
+/* Current page indication */
+nav a[aria-current="page"] {
+  background: #007bff;
+  color: white;
+  font-weight: bold;
+}
+
+/* Focus management */
+nav a:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}`,
+                info: 'The nav element defines a section containing navigation links to other pages or parts within the current page.',
+                features: [
+                    { title: 'Landmark Navigation', desc: 'Creates a navigation landmark for assistive technologies' },
+                    { title: 'Multiple Nav Support', desc: 'Use aria-label to distinguish between different navigation areas' },
+                    { title: 'Skip Links', desc: 'Essential for keyboard users to skip repetitive navigation' }
+                ]
+            },
+            'main': {
+                name: 'main',
+                description: 'Contains the primary content of the document',
+                accessibility: 'good',
+                demo: `
+                    <main style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); padding: 2rem; border-radius: 15px; min-height: 200px; position: relative; overflow: hidden;">
+                        <div style="position: relative; z-index: 2;">
+                            <h1 style="color: #8b4513; margin-bottom: 1rem; font-size: 1.8rem;">🎯 Main Content Area</h1>
+                            <p style="color: #5d4e37; margin-bottom: 1rem; line-height: 1.6;">This is the primary content of the page. Only one main element should be present per document, and it should contain the central topic or functionality.</p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+                                <div style="background: rgba(255,255,255,0.3); padding: 1rem; border-radius: 10px; backdrop-filter: blur(10px);">
+                                    <h3 style="color: #8b4513; margin-bottom: 0.5rem;">📊 Key Feature</h3>
+                                    <p style="color: #5d4e37; font-size: 0.9rem;">Essential content that users came to see</p>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.3); padding: 1rem; border-radius: 10px; backdrop-filter: blur(10px);">
+                                    <h3 style="color: #8b4513; margin-bottom: 0.5rem;">🎨 Interactive Element</h3>
+                                    <p style="color: #5d4e37; font-size: 0.9rem;">Primary user interactions happen here</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; animation: float 3s ease-in-out infinite;"></div>
+                    </main>
+                    <style>
+                        @keyframes float {
+                            0%, 100% { transform: translateY(0px); }
+                            50% { transform: translateY(-20px); }
+                        }
+                    </style>
+                `,
+                html: `<main>
+  <h1>Welcome to Our Application</h1>
+  <section>
+    <h2>Getting Started</h2>
+    <p>This main content area contains the primary information users are looking for.</p>
+  </section>
+  
+  <section>
+    <h2>Key Features</h2>
+    <ul>
+      <li>Feature one with detailed explanation</li>
+      <li>Feature two with interactive elements</li>
+      <li>Feature three with user benefits</li>
+    </ul>
+  </section>
+</main>`,
+                css: `main {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  padding: 2rem;
+  border-radius: 15px;
+  min-height: 400px;
+  position: relative;
+  overflow: hidden;
+}
+
+main h1 {
+  color: #8b4513;
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+}
+
+main section {
+  margin-bottom: 2rem;
+  background: rgba(255,255,255,0.3);
+  padding: 1.5rem;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+main section h2 {
+  color: #8b4513;
+  margin-bottom: 1rem;
+}`,
+                accessibility: `/* Main Content Accessibility */
+
+/* Only one main element per page */
+main {
+  /* Automatically creates "main" landmark */
+}
+
+/* Skip to main content link */
+.skip-to-main {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #000;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 1000;
+}
+
+.skip-to-main:focus {
+  top: 6px;
+}
+
+/* Focus management for single-page apps */
+main[tabindex="-1"] {
+  outline: none;
+}
+
+/* ARIA labeling when needed */
+main[aria-labelledby="page-title"] {
+  /* References the main heading */
+}`,
+                info: 'The main element represents the dominant content of the document body. There should be only one main element per page.',
+                features: [
+                    { title: 'Single Instance', desc: 'Only one main element should exist per document' },
+                    { title: 'Skip Navigation Target', desc: 'Common destination for "skip to content" links' },
+                    { title: 'Screen Reader Landmark', desc: 'Provides direct access to primary content' }
+                ]
+            },
+            'section': {
+                name: 'section',
+                description: 'Defines distinct sections of content',
+                accessibility: 'good',
+                demo: `
+                    <div style="display: grid; gap: 1.5rem;">
+                        <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px; position: relative; overflow: hidden;">
+                            <div style="position: relative; z-index: 2;">
+                                <h2 style="margin: 0 0 1rem 0; font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    🚀 <span>Product Features</span>
+                                </h2>
+                                <p style="margin: 0; opacity: 0.9; line-height: 1.6;">Discover the powerful capabilities that make our product stand out in the market.</p>
+                            </div>
+                            <div style="position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                        </section>
+                        
+                        <section style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2rem; border-radius: 12px; position: relative; overflow: hidden;">
+                            <div style="position: relative; z-index: 2;">
+                                <h2 style="margin: 0 0 1rem 0; font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    📊 <span>Analytics Dashboard</span>
+                                </h2>
+                                <p style="margin: 0; opacity: 0.9; line-height: 1.6;">Real-time insights and data visualization to help you make informed decisions.</p>
+                            </div>
+                            <div style="position: absolute; bottom: -20px; left: -20px; width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                        </section>
+                        
+                        <section style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 2rem; border-radius: 12px; position: relative; overflow: hidden;">
+                            <div style="position: relative; z-index: 2;">
+                                <h2 style="margin: 0 0 1rem 0; font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    🛡️ <span>Security & Privacy</span>
+                                </h2>
+                                <p style="margin: 0; opacity: 0.9; line-height: 1.6;">Enterprise-grade security measures to protect your data and ensure compliance.</p>
+                            </div>
+                            <div style="position: absolute; top: 50%; right: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; transform: translateY(-50%);"></div>
+                        </section>
+                    </div>
+                `,
+                html: `<section>
+  <h2>Product Features</h2>
+  <p>Discover the powerful capabilities that make our product stand out.</p>
+  <ul>
+    <li>Advanced analytics and reporting</li>
+    <li>Real-time collaboration tools</li>
+    <li>Enterprise-grade security</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Customer Testimonials</h2>
+  <blockquote>
+    <p>"This product has transformed our workflow completely."</p>
+    <cite>— Sarah Johnson, Tech Lead</cite>
+  </blockquote>
+</section>`,
+                css: `section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+section h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+section p {
+  margin: 0 0 1rem 0;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+section ul {
+  list-style: none;
+  padding: 0;
+}
+
+section li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+section li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #4ade80;
+  font-weight: bold;
+}`,
+                accessibility: `/* Section Accessibility */
+
+/* Always include headings in sections */
+section h2, section h3 {
+  /* Provides structure for screen readers */
+}
+
+/* ARIA labeling for complex sections */
+section[aria-labelledby="features-heading"] {
+  /* References the section's heading */
+}
+
+section[aria-label="Customer testimonials"] {
+  /* When no visible heading exists */
+}
+
+/* Nested sections create subsections */
+section section {
+  /* Creates hierarchical content structure */
+}
+
+/* Focus management for interactive sections */
+section[tabindex="0"] {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+section[tabindex="0"]:focus {
+  outline-style: solid;
+}`,
+                info: 'The section element represents a generic section of a document, typically with a heading.',
+                features: [
+                    { title: 'Content Grouping', desc: 'Groups related content together logically' },
+                    { title: 'Heading Hierarchy', desc: 'Should contain a heading element (h1-h6)' },
+                    { title: 'Semantic Structure', desc: 'Creates meaningful document outline for accessibility' }
+                ]
+            },
+            'article': {
+                name: 'article',
+                description: 'Self-contained, independently distributable content',
+                accessibility: 'good',
+                demo: `
+                    <article style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 15px; padding: 2rem; box-shadow: 0 8px 32px rgba(0,0,0,0.1); position: relative; overflow: hidden;">
+                        <div style="position: relative; z-index: 2;">
+                            <header style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(139, 69, 19, 0.2);">
+                                <h2 style="color: #8b4513; margin: 0 0 0.5rem 0; font-size: 1.8rem;">📝 The Future of Web Development</h2>
+                                <div style="display: flex; gap: 1rem; align-items: center; color: #5d4e37; font-size: 0.9rem;">
+                                    <span>👤 By Alex Chen</span>
+                                    <span>📅 March 15, 2024</span>
+                                    <span>⏱️ 5 min read</span>
+                                </div>
+                            </header>
+                            
+                            <div style="color: #5d4e37; line-height: 1.7;">
+                                <p style="margin: 0 0 1rem 0;">Web development continues to evolve at a rapid pace, with new technologies and methodologies emerging regularly. In this article, we explore the trends shaping the future of web development.</p>
+                                
+                                <p style="margin: 0 0 1rem 0; font-style: italic; background: rgba(255,255,255,0.3); padding: 1rem; border-radius: 8px;">This content is self-contained and could be distributed independently as a blog post, news article, or forum post.</p>
+                            </div>
+                            
+                            <footer style="margin-top: 1.5rem; padding-top: 1rem; border-top: 2px solid rgba(139, 69, 19, 0.2); display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <span style="background: rgba(139, 69, 19, 0.1); color: #8b4513; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">#webdev</span>
+                                    <span style="background: rgba(139, 69, 19, 0.1); color: #8b4513; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">#frontend</span>
+                                    <span style="background: rgba(139, 69, 19, 0.1); color: #8b4513; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">#technology</span>
+                                </div>
+                                <div style="display: flex; gap: 1rem; color: #5d4e37;">
+                                    <span>👍 42 likes</span>
+                                    <span>💬 12 comments</span>
+                                </div>
+                            </footer>
+                        </div>
+                        <div style="position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; animation: pulse 4s ease-in-out infinite;"></div>
+                    </article>
+                    <style>
+                        @keyframes pulse {
+                            0%, 100% { transform: scale(1); opacity: 0.3; }
+                            50% { transform: scale(1.1); opacity: 0.1; }
+                        }
+                    </style>
+                `,
+                html: `<article>
+  <header>
+    <h2>The Future of Web Development</h2>
+    <div class="article-meta">
+      <span>By Alex Chen</span>
+      <time datetime="2024-03-15">March 15, 2024</time>
+      <span>5 min read</span>
+    </div>
+  </header>
+  
+  <p>Web development continues to evolve at a rapid pace, with new technologies and methodologies emerging regularly.</p>
+  
+  <p>This content is self-contained and could be distributed independently as a blog post, news article, or forum post.</p>
+  
+  <footer>
+    <div class="tags">
+      <span>#webdev</span>
+      <span>#frontend</span>
+      <span>#technology</span>
+    </div>
+    <div class="engagement">
+      <span>42 likes</span>
+      <span>12 comments</span>
+    </div>
+  </footer>
+</article>`,
+                css: `article {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+article header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(139, 69, 19, 0.2);
+}
+
+article h2 {
+  color: #8b4513;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+}
+
+.article-meta {
+  display: flex;
+  gap: 1rem;
+  color: #5d4e37;
+  font-size: 0.9rem;
+}
+
+article p {
+  color: #5d4e37;
+  line-height: 1.7;
+  margin: 0 0 1rem 0;
+}
+
+article footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid rgba(139, 69, 19, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}`,
+                accessibility: `/* Article Accessibility */
+
+/* Articles should have descriptive headings */
+article h1, article h2 {
+  /* Identifies the article's main topic */
+}
+
+/* Time elements for publication dates */
+article time[datetime] {
+  /* Machine-readable date format */
+}
+
+/* ARIA labeling for article sections */
+article[aria-labelledby="article-title"] {
+  /* References the article's main heading */
+}
+
+/* Author information */
+article .author[rel="author"] {
+  /* Semantic relationship to author */
+}
+
+/* Reading landmarks for long articles */
+article section[aria-label="Article content"] {
+  /* Helps screen readers navigate article sections */
+}
+
+/* Skip links within articles */
+article .skip-to-comments {
+  position: absolute;
+  left: -9999px;
+}
+
+article .skip-to-comments:focus {
+  position: static;
+}`,
+                info: 'The article element represents a complete, self-contained composition that could be independently distributed or reused.',
+                features: [
+                    { title: 'Self-Contained', desc: 'Should make sense when taken out of context' },
+                    { title: 'Syndication Ready', desc: 'Perfect for RSS feeds, social media sharing' },
+                    { title: 'Nested Articles', desc: 'Can contain other articles (like comments)' }
+                ]
+            },
+            'aside': {
+                name: 'aside',
+                description: 'Content indirectly related to main content',
+                accessibility: 'warning',
+                demo: `
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: start;">
+                        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; border: 2px solid #e9ecef;">
+                            <h3 style="color: #495057; margin: 0 0 1rem 0;">📖 Main Article Content</h3>
+                            <p style="color: #6c757d; margin: 0; line-height: 1.6;">This is the primary content that users are reading. The aside element contains supplementary information that relates to this content but isn't essential to understanding it.</p>
+                        </div>
+                        
+                        <aside style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 1.5rem; border-radius: 12px; border: 2px solid #90caf9; position: relative; overflow: hidden;">
+                            <div style="position: relative; z-index: 2;">
+                                <h4 style="color: #1565c0; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                                    💡 <span>Did You Know?</span>
+                                </h4>
+                                <div style="background: rgba(255,255,255,0.7); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                    <p style="color: #1976d2; margin: 0; font-size: 0.9rem; line-height: 1.5;">Semantic HTML elements improve accessibility by providing meaningful structure that screen readers can interpret.</p>
+                                </div>
+                                
+                                <h5 style="color: #1565c0; margin: 0 0 0.5rem 0; font-size: 0.9rem;">🔗 Related Links</h5>
+                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                    <li style="margin-bottom: 0.5rem;">
+                                        <a href="#" style="color: #1976d2; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem;">📄 HTML5 Specification</a>
+                                    </li>
+                                    <li style="margin-bottom: 0.5rem;">
+                                        <a href="#" style="color: #1976d2; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem;">🎨 CSS Grid Guide</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" style="color: #1976d2; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem;">♿ Accessibility Tips</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div style="position: absolute; bottom: -30px; right: -30px; width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%;"></div>
+                        </aside>
+                    </div>
+                `,
+                html: `<main>
+  <article>
+    <h1>Understanding Semantic HTML</h1>
+    <p>Semantic HTML provides meaning to web content...</p>
+    
+    <aside>
+      <h3>Did You Know?</h3>
+      <p>Semantic elements improve SEO and accessibility.</p>
+      
+      <h4>Related Resources</h4>
+      <ul>
+        <li><a href="#">HTML5 Specification</a></li>
+        <li><a href="#">WCAG Guidelines</a></li>
+        <li><a href="#">MDN Web Docs</a></li>
+      </ul>
+    </aside>
+  </article>
+</main>`,
+                css: `aside {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 2px solid #90caf9;
+  position: relative;
+  float: right;
+  width: 300px;
+  margin: 0 0 1rem 1rem;
+}
+
+aside h3, aside h4 {
+  color: #1565c0;
+  margin: 0 0 1rem 0;
+}
+
+aside p {
+  color: #1976d2;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+}
+
+aside ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+aside li {
+  margin-bottom: 0.5rem;
+}
+
+aside a {
+  color: #1976d2;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+aside a:hover {
+  text-decoration: underline;
+}`,
+                accessibility: `/* Aside Accessibility Considerations */
+
+/* Label asides when not obvious from content */
+aside[aria-label="Related information"] {
+  /* Provides context for the aside's purpose */
+}
+
+aside[aria-labelledby="sidebar-heading"] {
+  /* References a heading that describes the aside */
+}
+
+/* Skip aside content for screen readers */
+aside[aria-hidden="true"] {
+  /* Use sparingly, only for purely decorative asides */
+}
+
+/* Complementary landmark role (automatic) */
+aside {
+  /* Creates a "complementary" landmark */
+}
+
+/* Focus management */
+aside[tabindex="-1"] {
+  /* Allows programmatic focus without tab stop */
+  outline: none;
+}
+
+/* Warning: Aside can be confusing */
+/* Use clear headings and context */
+aside h3 {
+  /* Always include descriptive headings */
+}`,
+                info: 'The aside element represents content that is tangentially related to the main content but could be considered separate.',
+                features: [
+                    { title: 'Complementary Content', desc: 'Related but not essential to main content' },
+                    { title: 'Sidebar Material', desc: 'Perfect for sidebars, callouts, and related links' },
+                    { title: 'Context Sensitive', desc: 'Meaning changes based on parent element' }
+                ]
+            },
+            'footer': {
+                name: 'footer',
+                description: 'Footer information for its nearest sectioning content',
+                accessibility: 'good',
+                demo: `
+                    <footer style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 2rem; border-radius: 15px; position: relative; overflow: hidden;">
+                        <div style="position: relative; z-index: 2;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                                <div>
+                                    <h4 style="color: #ecf0f1; margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        🏢 <span>Company</span>
+                                    </h4>
+                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                        <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #bdc3c7; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;">About Us</a></li>
+                                        <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #bdc3c7; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;">Careers</a></li>
+                                        <li><a href="#" style="color: #bdc3c7; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;">Contact</a></li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h4 style="color: #ecf0f1; margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        📞 <span>Support</span>
+                                    </h4>
+                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                        <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #bdc3c7; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;">Help Center</a></li>
+                                        <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #bdc3c7; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;">Documentation</a></li>
+                                        <li><a href="#" style="color: #bdc3c7; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;">Status Page</a></li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h4 style="color: #ecf0f1; margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        📱 <span>Connect</span>
+                                    </h4>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <a href="#" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; color: #ecf0f1; text-decoration: none; transition: all 0.3s;">📘</a>
+                                        <a href="#" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; color: #ecf0f1; text-decoration: none; transition: all 0.3s;">🐦</a>
+                                        <a href="#" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; color: #ecf0f1; text-decoration: none; transition: all 0.3s;">💼</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                                <p style="color: #95a5a6; margin: 0; font-size: 0.9rem;">© 2024 Semantic Explorer. All rights reserved.</p>
+                                <div style="display: flex; gap: 1rem;">
+                                    <a href="#" style="color: #95a5a6; text-decoration: none; font-size: 0.8rem; transition: color 0.3s;">Privacy Policy</a>
+                                    <a href="#" style="color: #95a5a6; text-decoration: none; font-size: 0.8rem; transition: color 0.3s;">Terms of Service</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="position: absolute; top: -60px; left: -60px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; animation: rotate 20s linear infinite;"></div>
+                    </footer>
+                    <style>
+                        @keyframes rotate {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    </style>
+                `,
+                html: `<footer>
+  <div class="footer-content">
+    <div class="footer-section">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="/about">About Us</a></li>
+        <li><a href="/careers">Careers</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-section">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="/help">Help Center</a></li>
+        <li><a href="/docs">Documentation</a></li>
+        <li><a href="/status">Status Page</a></li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="footer-bottom">
+    <p>&copy; 2024 Company Name. All rights reserved.</p>
+    <div class="legal-links">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+    </div>
+  </div>
+</footer>`,
+                css: `footer {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 15px;
+  margin-top: 2rem;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section h4 {
+  color: #ecf0f1;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-section li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-section a {
+  color: #bdc3c7;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s;
+}
+
+.footer-section a:hover {
+  color: #ecf0f1;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.2);
+  padding-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-bottom p {
+  color: #95a5a6;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.legal-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.legal-links a {
+  color: #95a5a6;
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: color 0.3s;
+}
+
+.legal-links a:hover {
+  color: #ecf0f1;
+}`,
+                accessibility: `/* Footer Accessibility */
+
+/* Footer creates a contentinfo landmark */
+footer {
+  /* Automatically creates "contentinfo" landmark */
+}
+
+/* ARIA labeling for multiple footers */
+footer[aria-label="Site footer"] {
+  /* Helps distinguish when multiple footers exist */
+}
+
+/* Skip to footer link */
+.skip-to-footer {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #000;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 1000;
+}
+
+.skip-to-footer:focus {
+  top: 6px;
+}
+
+/* Focus management */
+footer a:focus {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}
+
+/* High contrast for readability */
+footer {
+  background: #2c3e50;
+  color: #ecf0f1;
+}`,
+                info: 'The footer element represents footer information for its nearest sectioning content or root section.',
+                features: [
+                    { title: 'Section Footer', desc: 'Can be used within sections for local footers' },
+                    { title: 'Site Footer', desc: 'Commonly contains copyright, contact, and legal links' },
+                    { title: 'Contentinfo Role', desc: 'Creates a landmark for screen readers' }
+                ]
+            }
+        };
+
+        // DOM Elements
+        const tagSelector = document.getElementById('tagSelector');
+        const visualDemo = document.getElementById('visualDemo');
+        const infoPanel = document.getElementById('infoPanel');
+        const tagTitle = document.getElementById('tagTitle');
+        const tagInfo = document.getElementById('tagInfo');
+        const featuresGrid = document.getElementById('featuresGrid');
+        const htmlCode = document.getElementById('htmlCode');
+        const cssCode = document.getElementById('cssCode');
+        const accessibilityCode = document.getElementById('accessibilityCode');
+        const copyBtn = document.getElementById('copyBtn');
+        const codeTabs = document.querySelectorAll('.code-tab');
+        let currentTag = null;
+
+        // Initialize the tag selector buttons
+        function initTagSelector() {
+            for (const tag in semanticTags) {
+                const tagData = semanticTags[tag];
+                const button = document.createElement('div');
+                button.className = 'tag-button';
+                button.innerHTML = `
+                    <div class="tag-name">
+                        <span>&lt;${tagData.name}&gt;</span>
+                        <span class="accessibility-indicator accessibility-${tagData.accessibility}"></span>
+                    </div>
+                    <div class="tag-description">${tagData.description}</div>
+                `;
+                button.addEventListener('click', () => selectTag(tag));
+                tagSelector.appendChild(button);
+            }
+        }
+
+        // Select a tag and update the UI
+        function selectTag(tag) {
+            const tagData = semanticTags[tag];
+            currentTag = tagData;
+            
+            // Update tag buttons
+            document.querySelectorAll('.tag-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Update visual demo
+            visualDemo.innerHTML = tagData.demo;
+            
+            // Update info panel
+            infoPanel.style.display = 'block';
+            tagTitle.textContent = `<${tagData.name}> Element`;
+            tagInfo.textContent = tagData.info;
+            
+            // Update features grid
+            featuresGrid.innerHTML = '';
+            tagData.features.forEach(feature => {
+                const featureCard = document.createElement('div');
+                featureCard.className = 'feature-card';
+                featureCard.innerHTML = `
+                    <h5>${feature.title}</h5>
+                    <p>${feature.desc}</p>
+                `;
+                featuresGrid.appendChild(featureCard);
+            });
+            
+            // Update code views
+            htmlCode.innerHTML = syntaxHighlight(tagData.html, 'html');
+            cssCode.innerHTML = syntaxHighlight(tagData.css, 'css');
+            accessibilityCode.innerHTML = syntaxHighlight(tagData.accessibility, 'css');
+        }
+
+        // Syntax highlighting function
+        function syntaxHighlight(code, lang) {
+            if (!code) return '';
+            
+            if (lang === 'html') {
+                return code
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/(".*?")/g, '<span class="syntax-string">$1</span>')
+                    .replace(/\b(html|head|body|header|nav|main|section|article|aside|footer|div|span|h1|h2|h3|h4|h5|h6|p|a|ul|ol|li|img|form|input|button|label|select|textarea|table|tr|td|th|thead|tbody|tfoot|meta|title|link|script|style)\b/g, '<span class="syntax-tag">$1</span>')
+                    .replace(/\b(class|id|href|src|alt|title|type|rel|charset|name|content|lang|role|aria-\w+)\b/g, '<span class="syntax-attribute">$1</span>')
+                    .replace(/&lt;!--(.*?)--&gt;/g, '<span class="syntax-comment">&lt;!--$1--&gt;</span>');
+            }
+            
+            if (lang === 'css') {
+                return code
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/(".*?")/g, '<span class="syntax-string">$1</span>')
+                    .replace(/\b(\.?[a-zA-Z][\w-]*)\b/g, '<span class="syntax-tag">$1</span>')
+                    .replace(/\b(margin|padding|width|height|display|position|top|right|bottom|left|color|background|font|border|border-radius|box-shadow|flex|grid|align|justify|gap|transition|animation|@keyframes|@media|:hover|:focus|:active|::before|::after)\b/g, '<span class="syntax-attribute">$1</span>')
+                    .replace(/\/\*(.*?)\*\//g, '<span class="syntax-comment">/*$1*/</span>');
+            }
+            
+            return code;
+        }
+
+        // Copy code to clipboard
+        function copyCode() {
+            if (!currentTag) return;
+            
+            const activeTab = document.querySelector('.code-tab.active');
+            const tabType = activeTab.dataset.tab;
+            let codeToCopy = '';
+            
+            switch(tabType) {
+                case 'html':
+                    codeToCopy = currentTag.html;
+                    break;
+                case 'css':
+                    codeToCopy = currentTag.css;
+                    break;
+                case 'accessibility':
+                    codeToCopy = currentTag.accessibility;
+                    break;
+            }
+            
+            navigator.clipboard.writeText(codeToCopy)
+                .then(() => {
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = '✓ Copied!';
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+        }
+
+        // Switch code tabs
+        function switchCodeTab(tab) {
+            // Update tab buttons
+            codeTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Show the selected tab content
+            const tabType = tab.dataset.tab;
+            document.querySelectorAll('.code-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            if (tabType === 'html') {
+                htmlCode.style.display = 'block';
+            } else if (tabType === 'css') {
+                cssCode.style.display = 'block';
+            } else if (tabType === 'accessibility') {
+                accessibilityCode.style.display = 'block';
+            }
+        }
+
+        // Initialize event listeners
+        function initEventListeners() {
+            copyBtn.addEventListener('click', copyCode);
+            
+            codeTabs.forEach(tab => {
+                tab.addEventListener('click', () => switchCodeTab(tab));
+            });
+        }
+
+        // Initialize the app
+        function init() {
+            initTagSelector();
+            initEventListeners();
+            
+            // Select the first tag by default
+            const firstTag = Object.keys(semanticTags)[0];
+            const firstButton = tagSelector.querySelector('.tag-button');
+            if (firstButton) {
+                firstButton.classList.add('active');
+                selectTag(firstTag);
+            }
+        }
+
+        // Run when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
