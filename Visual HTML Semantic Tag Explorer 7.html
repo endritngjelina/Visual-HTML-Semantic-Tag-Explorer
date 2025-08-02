@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual HTML Semantic Tag Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B35;
+            --secondary: #004CFF;
+            --accent: #00D4FF;
+            --dark: #1a1a1a;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --glass: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --gradient-primary: linear-gradient(135deg, #FF6B35, #F7931E);
+            --gradient-secondary: linear-gradient(135deg, #004CFF, #00D4FF);
+            --gradient-dark: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gradient-dark);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 8rem 2rem 2rem;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            height: fit-content;
+            position: sticky;
+            top: 8rem;
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .sidebar h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+
+        .tag-list {
+            list-style: none;
+        }
+
+        .tag-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-button {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-family: 'Monaco', 'Menlo', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .tag-button:hover::before,
+        .tag-button.active::before {
+            left: 0;
+        }
+
+        .tag-button:hover,
+        .tag-button.active {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        /* Main Content */
+        .main-content {
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        .explorer-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .explorer-title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .explorer-subtitle {
+            font-size: 1.25rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Tag Display Area */
+        .tag-display {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag-display::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tag-display.active::before {
+            opacity: 1;
+        }
+
+        .tag-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .tag-details h3 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .tag-description {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .tag-attributes {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .tag-attributes h4 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .attribute-list {
+            list-style: none;
+        }
+
+        .attribute-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.5rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Visual Comparison */
+        .visual-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-panel {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .comparison-panel:hover {
+            transform: translateY(-5px);
+        }
+
+        .panel-header {
+            background: var(--gradient-secondary);
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .panel-content {
+            padding: 2rem;
+            min-height: 300px;
+            position: relative;
+        }
+
+        /* Code Display */
+        .code-display {
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+
+        .code-highlight {
+            background: rgba(255, 107, 53, 0.2);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            animation: pulse 2s infinite;
+        }
+
+        /* Visual Demo */
+        .visual-demo {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            min-height: 200px;
+            position: relative;
+            background: linear-gradient(45deg, transparent 25%, rgba(255, 255, 255, 0.02) 25%, rgba(255, 255, 255, 0.02) 75%, transparent 75%), 
+                        linear-gradient(45deg, transparent 25%, rgba(255, 255, 255, 0.02) 25%, rgba(255, 255, 255, 0.02) 75%, transparent 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        .semantic-highlight {
+            position: absolute;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: rgba(255, 107, 53, 0.1);
+            animation: glow 2s infinite alternate;
+            pointer-events: none;
+        }
+
+        /* Interactive Features */
+        .interactive-controls {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .control-button {
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        .control-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .control-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.3);
+        }
+
+        /* Accessibility Features */
+        .accessibility-panel {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .accessibility-panel h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .accessibility-list {
+            list-style: none;
+        }
+
+        .accessibility-item {
+            background: rgba(40, 167, 69, 0.1);
+            border-left: 3px solid var(--success);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s ease;
+        }
+
+        .accessibility-item:hover {
+            background: rgba(40, 167, 69, 0.2);
+            transform: translateX(5px);
+        }
+
+        /* Best Practices */
+        .best-practices {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .best-practices h3 {
+            color: var(--warning);
+            margin-bottom: 1rem;
+        }
+
+        .practice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .practice-card {
+            background: rgba(255, 193, 7, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .practice-card:hover {
+            border-color: var(--warning);
+            transform: translateY(-5px);
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px var(--primary);
+            }
+            to {
+                box-shadow: 0 0 20px var(--primary), 0 0 30px var(--primary);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            z-index: 1001;
+            transition: width 0.3s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 6rem 1rem 2rem;
+            }
+            
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+            
+            .tag-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .visual-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .explorer-title {
+                font-size: 2rem;
+            }
+            
+            .interactive-controls {
+                justify-content: center;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">HTML Semantic Explorer</div>
+            <div class="header-controls">
+                <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+                <button class="control-button" onclick="exportCode()" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Export Code</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h2>🏷️ Semantic Tags</h2>
+            <ul class="tag-list" id="tagList">
+                <!-- Tags will be populated by JavaScript -->
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="explorer-header">
+                <h1 class="explorer-title">Visual HTML Semantic Explorer</h1>
+                <p class="explorer-subtitle">
+                    Discover the power of semantic HTML with interactive visualizations, 
+                    live code examples, and accessibility insights.
+                </p>
+            </div>
+
+            <div class="tag-display" id="tagDisplay">
+                <div class="tag-info">
+                    <div class="tag-details">
+                        <h3 id="tagName">&lt;section&gt;</h3>
+                        <p class="tag-description" id="tagDescription">
+                            Select a semantic tag from the sidebar to explore its meaning, usage, and visual representation.
+                        </p>
+                    </div>
+                    <div class="tag-attributes">
+                        <h4>Common Attributes</h4>
+                        <ul class="attribute-list" id="attributeList">
+                            <!-- Attributes will be populated by JavaScript -->
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="interactive-controls">
+                    <button class="control-button" onclick="animateDemo()">🎯 Animate Demo</button>
+                    <button class="control-button" onclick="toggleHighlight()">✨ Toggle Highlight</button>
+                    <button class="control-button" onclick="validateStructure()">✅ Validate Structure</button>
+                    <button class="control-button" onclick="generateExample()">🔄 Generate Example</button>
+                </div>
+
+                <div class="visual-comparison">
+                    <div class="comparison-panel">
+                        <div class="panel-header">📝 HTML Code</div>
+                        <div class="panel-content">
+                            <div class="code-display" id="codeDisplay">
+                                <!-- Code will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comparison-panel">
+                        <div class="panel-header">👁️ Visual Representation</div>
+                        <div class="panel-content">
+                            <div class="visual-demo" id="visualDemo">
+                                <!-- Visual demo will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accessibility-panel">
+                    <h3>♿ Accessibility Benefits</h3>
+                    <ul class="accessibility-list" id="accessibilityList">
+                        <!-- Accessibility info will be populated by JavaScript -->
+                    </ul>
+                </div>
+
+                <div class="best-practices">
+                    <h3>💡 Best Practices</h3>
+                    <div class="practice-grid" id="practiceGrid">
+                        <!-- Best practices will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Semantic HTML tags data
+        const semanticTags = {
+            'section': {
+                name: '&lt;section&gt;',
+                description: 'Represents a generic standalone section of a document, which doesn\'t have a more specific semantic element to represent it. Sections should always have a heading, with very few exceptions.',
+                attributes: ['id', 'class', 'aria-labelledby', 'role'],
+                code: `<section aria-labelledby="products-heading">
+  <h2 id="products-heading">Our Products</h2>
+  <div class="product-grid">
+    <article class="product-card">
+      <h3>Premium Widget</h3>
+      <p>High-quality widget for professionals</p>
+    </article>
+    <article class="product-card">
+      <h3>Standard Widget</h3>
+      <p>Reliable widget for everyday use</p>
+    </article>
+  </div>
+</section>`,
+                visual: '<div style="border: 2px solid #FF6B35; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"><h3 style="color: #FF6B35; margin: 0 0 1rem 0;">Our Products</h3><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;"><div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 6px;"><strong>Premium Widget</strong><br>High-quality widget</div><div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 6px;"><strong>Standard Widget</strong><br>Reliable widget</div></div></div>',
+                accessibility: [
+                    'Provides structural meaning to screen readers',
+                    'Helps users navigate content sections',
+                    'Creates logical document outline',
+                    'Supports landmark navigation'
+                ],
+                practices: [
+                    { title: 'Always include headings', desc: 'Each section should have a heading element (h1-h6)' },
+                    { title: 'Use meaningful content', desc: 'Don\'t use section just for styling purposes' },
+                    { title: 'Consider alternatives', desc: 'Use more specific elements like <article> or <nav> when appropriate' },
+                    { title: 'Nest logically', desc: 'Sections can contain other sections for hierarchical content' }
+                ]
+            },
+            'article': {
+                name: '&lt;article&gt;',
+                description: 'Represents a self-contained composition in a document, page, application, or site, which is intended to be independently distributable or reusable. Could be a forum post, magazine or newspaper article, blog entry, product card, or any other independent item of content.',
+                attributes: ['id', 'class', 'itemscope', 'itemtype'],
+                code: `<article itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <h2 itemprop="headline">Understanding Semantic HTML</h2>
+    <time itemprop="datePublished" datetime="2025-01-15">
+      January 15, 2025
+    </time>
+    <address itemprop="author">By Jane Developer</address>
+  </header>
+  
+  <div itemprop="articleBody">
+    <p>Semantic HTML provides meaning and structure...</p>
+    <p>This improves accessibility and SEO...</p>
+  </div>
+  
+  <footer>
+    <p>Tags: <span itemprop="keywords">HTML, Semantics, Web Development</span></p>
+  </footer>
+</article>`,
+                visual: '<div style="border: 2px solid #004CFF; padding: 1.5rem; border-radius: 8px; background: rgba(0,76,255,0.05);"><header style="border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 1rem; margin-bottom: 1rem;"><h3 style="color: #004CFF; margin: 0 0 0.5rem 0;">Understanding Semantic HTML</h3><small style="color: #6c757d;">January 15, 2025 • By Jane Developer</small></header><div style="margin-bottom: 1rem;"><p style="margin-bottom: 0.5rem;">Semantic HTML provides meaning and structure to web content, making it more accessible and meaningful for both users and machines.</p><p>This improves accessibility, SEO, and code maintainability significantly.</p></div><footer style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1rem; font-size: 0.9rem; color: #6c757d;">Tags: HTML, Semantics, Web Development</footer></div>',
+                accessibility: [
+                    'Screen readers can identify and navigate articles',
+                    'Improves content discovery and syndication',
+                    'Provides context for assistive technologies',
+                    'Enables better content summarization'
+                ],
+                practices: [
+                    { title: 'Self-contained content', desc: 'Article content should make sense on its own' },
+                    { title: 'Include publication info', desc: 'Use <time> and <address> for metadata' },
+                    { title: 'Use proper headings', desc: 'Structure content with appropriate heading levels' },
+                    { title: 'Consider microdata', desc: 'Add schema.org markup for rich snippets' }
+                ]
+            },
+            'header': {
+                name: '&lt;header&gt;',
+                description: 'Represents introductory content, typically a group of introductory or navigational aids. It may contain some heading elements but also a logo, a search form, an author name, and other elements.',
+                attributes: ['id', 'class', 'role', 'aria-label'],
+                code: `<header role="banner">
+  <div class="site-branding">
+    <img src="logo.svg" alt="Company Logo" />
+    <h1>My Website</h1>
+  </div>
+  
+  <nav aria-label="Main navigation">
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+  
+  <div class="header-actions">
+    <button aria-label="Search">🔍</button>
+    <button aria-label="User menu">👤</button>
+  </div>
+</header>`,
+                visual: '<div style="border: 2px solid #00D4FF; padding: 1.5rem; border-radius: 8px; background: rgba(0,212,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;"><div style="display: flex; align-items: center; gap: 1rem;"><div style="width: 40px; height: 40px; background: #00D4FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">L</div><h3 style="color: #00D4FF; margin: 0;">My Website</h3></div><nav style="display: flex; gap: 1rem;"><a href="#" style="color: #fff; text-decoration: none; padding: 0.5rem;">Home</a><a href="#" style="color: #fff; text-decoration: none; padding: 0.5rem;">About</a><a href="#" style="color: #fff; text-decoration: none; padding: 0.5rem;">Services</a></nav><div style="display: flex; gap: 0.5rem;"><button style="background: rgba(255,255,255,0.1); border: none; color: white; padding: 0.5rem; border-radius: 4px; cursor: pointer;">🔍</button><button style="background: rgba(255,255,255,0.1); border: none; color: white; padding: 0.5rem; border-radius: 4px; cursor: pointer;">👤</button></div></div>',
+                accessibility: [
+                    'Provides banner landmark for screen readers',
+                    'Helps users quickly identify site header',
+                    'Contains primary navigation elements',
+                    'Establishes page hierarchy and structure'
+                ],
+                practices: [
+                    { title: 'One main header per page', desc: 'Use role="banner" for the primary site header' },
+                    { title: 'Include site identity', desc: 'Logo, site name, or branding should be present' },
+                    { title: 'Primary navigation', desc: 'Main site navigation typically belongs in header' },
+                    { title: 'Responsive design', desc: 'Ensure header works well on all screen sizes' }
+                ]
+            },
+            'nav': {
+                name: '&lt;nav&gt;',
+                description: 'Represents a section of a page whose purpose is to provide navigation links, either within the current document or to other documents. Common examples include menus, tables of contents, and indexes.',
+                attributes: ['aria-label', 'aria-labelledby', 'role', 'id'],
+                code: `<nav aria-label="Main site navigation">
+  <ul>
+    <li><a href="/" aria-current="page">Home</a></li>
+    <li>
+      <a href="/products" aria-expanded="false">Products</a>
+      <ul>
+        <li><a href="/products/widgets">Widgets</a></li>
+        <li><a href="/products/gadgets">Gadgets</a></li>
+      </ul>
+    </li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Breadcrumb Navigation -->
+<nav aria-label="Breadcrumb">
+  <ol>
+    <li><a href="/">Home</a></li>
+    <li><a href="/products">Products</a></li>
+    <li aria-current="page">Premium Widgets</li>
+  </ol>
+</nav>`,
+                visual: '<div style="border: 2px solid #28a745; padding: 1.5rem; border-radius: 8px; background: rgba(40,167,69,0.05);"><div style="margin-bottom: 1.5rem;"><strong style="color: #28a745;">Main Navigation:</strong><div style="display: flex; gap: 2rem; margin-top: 0.5rem; flex-wrap: wrap;"><a href="#" style="color: #fff; text-decoration: none; padding: 0.5rem 1rem; background: rgba(40,167,69,0.2); border-radius: 4px; border: 1px solid #28a745;">Home</a><div style="position: relative;"><a href="#" style="color: #fff; text-decoration: none; padding: 0.5rem 1rem; background: rgba(255,255,255,0.1); border-radius: 4px;">Products ▼</a></div><a href="#" style="color: #fff; text-decoration: none; padding: 0.5rem 1rem; background: rgba(255,255,255,0.1); border-radius: 4px;">About</a><a href="#" style="color: #fff; text-decoration: none; padding: 0.5rem 1rem; background: rgba(255,255,255,0.1); border-radius: 4px;">Contact</a></div></div><div><strong style="color: #28a745;">Breadcrumb:</strong><div style="margin-top: 0.5rem; font-size: 0.9rem;"><a href="#" style="color: #00D4FF; text-decoration: none;">Home</a> <span style="color: #6c757d;">></span> <a href="#" style="color: #00D4FF; text-decoration: none;">Products</a> <span style="color: #6c757d;">></span> <span style="color: #fff;">Premium Widgets</span></div></div></div>',
+                accessibility: [
+                    'Creates navigation landmark for screen readers',
+                    'Enables skip navigation functionality',
+                    'Provides keyboard navigation support',
+                    'Helps users understand site structure'
+                ],
+                practices: [
+                    { title: 'Use descriptive labels', desc: 'aria-label helps distinguish multiple nav elements' },
+                    { title: 'Implement skip links', desc: 'Allow users to bypass navigation when needed' },
+                    { title: 'Keyboard accessible', desc: 'Ensure all nav items are reachable via keyboard' },
+                    { title: 'Current page indication', desc: 'Use aria-current to highlight active pages' }
+                ]
+            },
+            'main': {
+                name: '&lt;main&gt;',
+                description: 'Represents the dominant content of the body of a document. The main content area consists of content that is directly related to or expands upon the central topic of a document, or the central functionality of an application.',
+                attributes: ['id', 'class', 'role', 'tabindex'],
+                code: `<main id="main-content" tabindex="-1">
+  <h1>Welcome to Our Product Showcase</h1>
+  
+  <section aria-labelledby="featured-heading">
+    <h2 id="featured-heading">Featured Products</h2>
+    <div class="product-grid">
+      <!-- Product cards here -->
+    </div>
+  </section>
+  
+  <section aria-labelledby="testimonials-heading">
+    <h2 id="testimonials-heading">Customer Testimonials</h2>
+    <div class="testimonials">
+      <!-- Testimonial content here -->
+    </div>
+  </section>
+  
+  <section aria-labelledby="newsletter-heading">
+    <h2 id="newsletter-heading">Newsletter Signup</h2>
+    <form>
+      <!-- Newsletter form here -->
+    </form>
+  </section>
+</main>`,
+                visual: '<div style="border: 2px solid #ffc107; padding: 2rem; border-radius: 8px; background: rgba(255,193,7,0.05);"><h2 style="color: #ffc107; margin: 0 0 1.5rem 0;">Welcome to Our Product Showcase</h2><div style="margin-bottom: 2rem;"><h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Featured Products</h3><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;"><div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 6px; text-align: center;">Product 1</div><div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 6px; text-align: center;">Product 2</div><div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 6px; text-align: center;">Product 3</div></div></div><div style="margin-bottom: 2rem;"><h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Customer Testimonials</h3><div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 6px; font-style: italic;">"Great products and excellent service!" - Happy Customer</div></div><div><h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">Newsletter Signup</h3><div style="display: flex; gap: 0.5rem;"><input type="email" placeholder="Enter email" style="flex: 1; padding: 0.5rem; border: 1px solid #6c757d; border-radius: 4px; background: rgba(255,255,255,0.1); color: white;"><button style="background: #ffc107; color: #000; border: none; padding: 0.5rem 1rem; border-radius: 4px;">Subscribe</button></div></div></div>',
+                accessibility: [
+                    'Provides main landmark for screen readers',
+                    'Enables skip-to-content functionality',
+                    'Helps screen reader users find primary content',
+                    'Creates logical content hierarchy'
+                ],
+                practices: [
+                    { title: 'One main per page', desc: 'Each page should have exactly one main element' },
+                    { title: 'Skip link target', desc: 'Use tabindex="-1" for skip navigation functionality' },
+                    { title: 'Direct child of body', desc: 'Main should not be nested within other semantic elements' },
+                    { title: 'Focus management', desc: 'Consider focusing main element for single-page apps' }
+                ]
+            },
+            'aside': {
+                name: '&lt;aside&gt;',
+                description: 'Represents a portion of a document whose content is only indirectly related to the documents main content. Asides are frequently presented as sidebars or call-out boxes.',
+                attributes: ['aria-label', 'aria-labelledby', 'role', 'id'],
+                code: `<aside aria-labelledby="sidebar-heading">
+  <h3 id="sidebar-heading">Related Articles</h3>
+  <ul>
+    <li><a href="/article1">Understanding CSS Grid</a></li>
+    <li><a href="/article2">Modern JavaScript Features</a></li>
+    <li><a href="/article3">Responsive Design Patterns</a></li>
+  </ul>
+</aside>
+
+<aside aria-label="Advertisement">
+  <div class="ad-banner">
+    <h4>Premium Web Tools</h4>
+    <p>Boost your productivity with our suite of development tools.</p>
+    <button>Learn More</button>
+  </div>
+</aside>
+
+<aside aria-label="Author bio">
+  <div class="author-card">
+    <img src="author.jpg" alt="Jane Developer" />
+    <h4>About the Author</h4>
+    <p>Jane is a senior front-end developer with 8 years of experience...</p>
+  </div>
+</aside>`,
+                visual: '<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;"><div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;"><h3 style="margin: 0 0 1rem 0;">Main Article Content</h3><p>This is the primary content of the page. The aside elements contain supplementary information that relates to but is separate from the main content.</p></div><div style="display: flex; flex-direction: column; gap: 1rem;"><div style="border: 2px solid #dc3545; padding: 1rem; border-radius: 8px; background: rgba(220,53,69,0.05);"><h4 style="color: #dc3545; margin: 0 0 0.5rem 0;">Related Articles</h4><ul style="list-style: none; padding: 0; margin: 0;"><li style="margin-bottom: 0.5rem;"><a href="#" style="color: #00D4FF; text-decoration: none; font-size: 0.9rem;">• Understanding CSS Grid</a></li><li style="margin-bottom: 0.5rem;"><a href="#" style="color: #00D4FF; text-decoration: none; font-size: 0.9rem;">• Modern JavaScript</a></li><li><a href="#" style="color: #00D4FF; text-decoration: none; font-size: 0.9rem;">• Responsive Design</a></li></ul></div><div style="border: 2px solid #dc3545; padding: 1rem; border-radius: 8px; background: rgba(220,53,69,0.05);"><h4 style="color: #dc3545; margin: 0 0 0.5rem 0;">Author Bio</h4><div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;"><div style="width: 40px; height: 40px; background: #6c757d; border-radius: 50%; display: flex; align-items: center; justify-content: center;">👤</div><div><strong>Jane Developer</strong><br><small style="color: #6c757d;">Senior Frontend Dev</small></div></div></div></div></div>',
+                accessibility: [
+                    'Creates complementary landmark region',
+                    'Helps users distinguish supplementary content',
+                    'Enables content navigation and skipping',
+                    'Provides context for related information'
+                ],
+                practices: [
+                    { title: 'Tangentially related', desc: 'Content should relate to but not be essential to main content' },
+                    { title: 'Use descriptive labels', desc: 'aria-label helps identify the purpose of each aside' },
+                    { title: 'Consider placement', desc: 'Visual position should reflect content relationship' },
+                    { title: 'Responsive behavior', desc: 'Plan how asides will reflow on smaller screens' }
+                ]
+            },
+            'footer': {
+                name: '&lt;footer&gt;',
+                description: 'Represents a footer for its nearest sectioning content or sectioning root element. A footer typically contains information about the author of the section, copyright data or links to related documents.',
+                attributes: ['role', 'aria-label', 'aria-labelledby', 'id'],
+                code: `<footer role="contentinfo">
+  <div class="footer-content">
+    <section aria-labelledby="company-info">
+      <h3 id="company-info">Company Info</h3>
+      <address>
+        123 Web Street<br>
+        Development City, DC 12345<br>
+        <a href="tel:+1234567890">+1 (234) 567-890</a><br>
+        <a href="mailto:info@example.com">info@example.com</a>
+      </address>
+    </section>
+    
+    <section aria-labelledby="quick-links">
+      <h3 id="quick-links">Quick Links</h3>
+      <ul>
+        <li><a href="/privacy">Privacy Policy</a></li>
+        <li><a href="/terms">Terms of Service</a></li>
+        <li><a href="/sitemap">Sitemap</a></li>
+      </ul>
+    </section>
+    
+    <section aria-labelledby="social-media">
+      <h3 id="social-media">Follow Us</h3>
+      <div class="social-links">
+        <a href="#" aria-label="Facebook">📘</a>
+        <a href="#" aria-label="Twitter">🐦</a>
+        <a href="#" aria-label="LinkedIn">💼</a>
+      </div>
+    </section>
+  </div>
+  
+  <div class="footer-bottom">
+    <p>&copy; 2025 Your Company Name. All rights reserved.</p>
+  </div>
+</footer>`,
+                visual: '<div style="border: 2px solid #6f42c1; padding: 2rem; border-radius: 8px; background: rgba(111,66,193,0.05);"><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;"><div><h4 style="color: #6f42c1; margin: 0 0 1rem 0;">Company Info</h4><div style="font-size: 0.9rem; line-height: 1.6;"><div>123 Web Street</div><div>Development City, DC 12345</div><div><a href="#" style="color: #00D4FF; text-decoration: none;">+1 (234) 567-890</a></div><div><a href="#" style="color: #00D4FF; text-decoration: none;">info@example.com</a></div></div></div><div><h4 style="color: #6f42c1; margin: 0 0 1rem 0;">Quick Links</h4><ul style="list-style: none; padding: 0; margin: 0; font-size: 0.9rem;"><li style="margin-bottom: 0.5rem;"><a href="#" style="color: #00D4FF; text-decoration: none;">Privacy Policy</a></li><li style="margin-bottom: 0.5rem;"><a href="#" style="color: #00D4FF; text-decoration: none;">Terms of Service</a></li><li><a href="#" style="color: #00D4FF; text-decoration: none;">Sitemap</a></li></ul></div><div><h4 style="color: #6f42c1; margin: 0 0 1rem 0;">Follow Us</h4><div style="display: flex; gap: 1rem;"><a href="#" style="text-decoration: none; font-size: 1.5rem;">📘</a><a href="#" style="text-decoration: none; font-size: 1.5rem;">🐦</a><a href="#" style="text-decoration: none; font-size: 1.5rem;">💼</a></div></div></div><div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1rem; text-align: center; font-size: 0.9rem; color: #6c757d;">&copy; 2025 Your Company Name. All rights reserved.</div></div>',
+                accessibility: [
+                    'Provides contentinfo landmark for screen readers',
+                    'Contains important site-wide information',
+                    'Helps users find contact and legal information',
+                    'Creates consistent page structure'
+                ],
+                practices: [
+                    { title: 'Site-wide footer', desc: 'Use role="contentinfo" for the main site footer' },
+                    { title: 'Contact information', desc: 'Include address, phone, email using <address> element' },
+                    { title: 'Legal links', desc: 'Privacy policy, terms of service, accessibility statements' },
+                    { title: 'Consistent placement', desc: 'Footer should appear on every page in same location' }
+                ]
+            }
+        };
+
+        // Current state
+        let currentTag = 'section';
+        let isHighlighted = false;
+        let isThemeDark = true;
+
+        // Initialize the application
+        function init() {
+            populateTagList();
+            loadTag(currentTag);
+            updateProgressBar();
+            
+            // Add scroll listener for progress bar
+            window.addEventListener('scroll', updateProgressBar);
+            
+            // Add keyboard navigation
+            document.addEventListener('keydown', handleKeyboardNavigation);
+        }
+
+        // Populate the tag list in sidebar
+        function populateTagList() {
+            const tagList = document.getElementById('tagList');
+            tagList.innerHTML = '';
+
+            Object.keys(semanticTags).forEach(tagKey => {
+                const li = document.createElement('li');
+                li.className = 'tag-item';
+                
+                const button = document.createElement('button');
+                button.className = `tag-button ${tagKey === currentTag ? 'active' : ''}`;
+                button.textContent = semanticTags[tagKey].name.replace(/&lt;|&gt;/g, match => 
+                    match === '&lt;' ? '<' : '>'
+                );
+                button.onclick = () => loadTag(tagKey);
+                
+                li.appendChild(button);
+                tagList.appendChild(li);
+            });
+        }
+
+        // Load a specific tag's information
+        function loadTag(tagKey) {
+            const tag = semanticTags[tagKey];
+            if (!tag) return;
+
+            currentTag = tagKey;
+            
+            // Update active button
+            document.querySelectorAll('.tag-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[onclick="loadTag('${tagKey}')"]`).classList.add('active');
+
+            // Update tag display with animation
+            const tagDisplay = document.getElementById('tagDisplay');
+            tagDisplay.style.opacity = '0';
+            tagDisplay.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                // Update content
+                document.getElementById('tagName').innerHTML = tag.name;
+                document.getElementById('tagDescription').textContent = tag.description;
+                
+                // Update attributes
+                const attributeList = document.getElementById('attributeList');
+                attributeList.innerHTML = '';
+                tag.attributes.forEach(attr => {
+                    const li = document.createElement('li');
+                    li.className = 'attribute-item';
+                    li.textContent = attr;
+                    attributeList.appendChild(li);
+                });
+
+                // Update code display
+                document.getElementById('codeDisplay').innerHTML = highlightCode(tag.code);
+                
+                // Update visual demo
+                document.getElementById('visualDemo').innerHTML = tag.visual;
+                
+                // Update accessibility list
+                const accessibilityList = document.getElementById('accessibilityList');
+                accessibilityList.innerHTML = '';
+                tag.accessibility.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'accessibility-item';
+                    li.textContent = item;
+                    accessibilityList.appendChild(li);
+                });
+
+                // Update best practices
+                const practiceGrid = document.getElementById('practiceGrid');
+                practiceGrid.innerHTML = '';
+                tag.practices.forEach(practice => {
+                    const div = document.createElement('div');
+                    div.className = 'practice-card';
+                    div.innerHTML = `
+                        <h4 style="color: var(--warning); margin-bottom: 0.5rem;">${practice.title}</h4>
+                        <p style="font-size: 0.9rem; margin: 0;">${practice.desc}</p>
+                    `;
+                    practiceGrid.appendChild(div);
+                });
+
+                // Animate back in
+                tagDisplay.style.opacity = '1';
+                tagDisplay.style.transform = 'translateY(0)';
+                tagDisplay.classList.add('active');
+            }, 200);
+
+            setTimeout(() => {
+                tagDisplay.classList.remove('active');
+            }, 600);
+        }
+
+        // Highlight code syntax
+        function highlightCode(code) {
+            return code
+                .replace(/(&lt;\/?)([a-zA-Z-]+)([^&gt;]*&gt;)/g, 
+                    '$1<span class="code-highlight">$2</span>$3')
+                .replace(/(aria-[a-zA-Z-]+|class|id|role|datetime|itemprop|itemscope|itemtype)=/g, 
+                    '<span style="color: #00D4FF;">$1</span>=')
+                .replace(/="([^"]*)"/g, '="<span style="color: #28a745;">$1</span>"')
+                .replace(/&lt;/g, '<span style="color: #FF6B35;">&lt;</span>')
+                .replace(/&gt;/g, '<span style="color: #FF6B35;">&gt;</span>');
+        }
+
+        // Animate the demo
+        function animateDemo() {
+            const visualDemo = document.getElementById('visualDemo');
+            const elements = visualDemo.querySelectorAll('*');
+            
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.animation = 'float 1s ease-in-out';
+                    setTimeout(() => {
+                        el.style.animation = '';
+                    }, 1000);
+                }, index * 100);
+            });
+
+            // Add pulse effect to the demo container
+            visualDemo.style.animation = 'pulse 0.5s ease-in-out';
+            setTimeout(() => {
+                visualDemo.style.animation = '';
+            }, 500);
+        }
+
+        // Toggle highlight overlay
+        function toggleHighlight() {
+            const visualDemo = document.getElementById('visualDemo');
+            
+            if (isHighlighted) {
+                // Remove highlights
+                const highlights = visualDemo.querySelectorAll('.semantic-highlight');
+                highlights.forEach(highlight => highlight.remove());
+                isHighlighted = false;
+            } else {
+                // Add highlights to semantic elements
+                const semanticElements = visualDemo.querySelectorAll('div[style*="border: 2px solid"]');
+                semanticElements.forEach((el, index) => {
+                    const highlight = document.createElement('div');
+                    highlight.className = 'semantic-highlight';
+                    highlight.style.top = '-2px';
+                    highlight.style.left = '-2px';
+                    highlight.style.right = '-2px';
+                    highlight.style.bottom = '-2px';
+                    highlight.style.animationDelay = `${index * 0.2}s`;
+                    
+                    if (el.style.position !== 'relative') {
+                        el.style.position = 'relative';
+                    }
+                    el.appendChild(highlight);
+                });
+                isHighlighted = true;
+            }
+        }
+
+        // Validate HTML structure
+        function validateStructure() {
+            const tag = semanticTags[currentTag];
+            const validationMessages = [];
+
+            // Check for common issues based on tag type
+            switch (currentTag) {
+                case 'section':
+                    validationMessages.push('✅ Section contains heading element');
+                    validationMessages.push('✅ Content is thematically grouped');
+                    validationMessages.push('⚠️ Consider if <article> would be more appropriate');
+                    break;
+                case 'article':
+                    validationMessages.push('✅ Content is self-contained');
+                    validationMessages.push('✅ Includes publication metadata');
+                    validationMessages.push('✅ Proper heading hierarchy');
+                    break;
+                case 'header':
+                    validationMessages.push('✅ Contains site branding');
+                    validationMessages.push('✅ Includes primary navigation');
+                    validationMessages.push('✅ Uses banner landmark role');
+                    break;
+                case 'nav':
+                    validationMessages.push('✅ Descriptive aria-label provided');
+                    validationMessages.push('✅ Current page indicated');
+                    validationMessages.push('✅ Keyboard accessible');
+                    break;
+                case 'main':
+                    validationMessages.push('✅ Only one main element per page');
+                    validationMessages.push('✅ Contains primary page content');
+                    validationMessages.push('✅ Skip link target configured');
+                    break;
+                case 'aside':
+                    validationMessages.push('✅ Content is supplementary');
+                    validationMessages.push('✅ Properly labeled for context');
+                    validationMessages.push('⚠️ Consider responsive behavior');
+                    break;
+                case 'footer':
+                    validationMessages.push('✅ Contains site-wide information');
+                    validationMessages.push('✅ Includes contact details');
+                    validationMessages.push('✅ Legal links present');
+                    break;
+            }
+
+            // Display validation results
+            const resultHTML = validationMessages.map(msg => {
+                const isWarning = msg.includes('⚠️');
+                const color = isWarning ? '#ffc107' : '#28a745';
+                return `<div style="color: ${color}; margin-bottom: 0.5rem;">${msg}</div>`;
+            }).join('');
+
+            showNotification('Structure Validation', resultHTML);
+        }
+
+        // Generate a new example
+        function generateExample() {
+            const examples = {
+                section: [
+                    'Blog post section with multiple articles',
+                    'Product showcase with featured items',
+                    'FAQ section with common questions',
+                    'Team member profiles section'
+                ],
+                article: [
+                    'News article with byline and timestamp',
+                    'Blog post with metadata and tags',
+                    'Product review with rating',
+                    'Portfolio piece with description'
+                ],
+                header: [
+                    'Site header with logo and main navigation',
+                    'Article header with title and author',
+                    'Section header with heading and description',
+                    'Page header with breadcrumb navigation'
+                ],
+                nav: [
+                    'Main site navigation menu',
+                    'Breadcrumb navigation trail',
+                    'Pagination navigation controls',
+                    'Table of contents navigation'
+                ],
+                main: [
+                    'Homepage with hero section and features',
+                    'Article page with content and sidebar',
+                    'Product page with details and reviews',
+                    'Contact page with form and information'
+                ],
+                aside: [
+                    'Related articles sidebar',
+                    'Author biography box',
+                    'Advertisement placement',
+                    'Social media links widget'
+                ],
+                footer: [
+                    'Site footer with links and contact info',
+                    'Article footer with tags and sharing',
+                    'Newsletter signup section',
+                    'Copyright and legal information'
+                ]
+            };
+
+            const currentExamples = examples[currentTag];
+            const randomExample = currentExamples[Math.floor(Math.random() * currentExamples.length)];
+            
+            showNotification('Example Generated', `<strong>${randomExample}</strong><br><br>This demonstrates a practical use case for the &lt;${currentTag}&gt; element in real-world web development.`);
+        }
+
+        // Show notification popup
+        function showNotification(title, content) {
+            // Remove existing notification
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--glass);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 16px;
+                padding: 2rem;
+                max-width: 500px;
+                z-index: 2000;
+                animation: slideInDown 0.3s ease-out;
+                box-shadow: var(--shadow);
+            `;
+
+            notification.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="color: var(--primary); margin: 0;">${title}</h3>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="background: none; border: none; color: var(--light); font-size: 1.5rem; cursor: pointer;">×</button>
+                </div>
+                <div>${content}</div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Export code functionality
+        function exportCode() {
+            const tag = semanticTags[currentTag];
+            const blob = new Blob([tag.code], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentTag}-example.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Code Exported', `HTML code for &lt;${currentTag}&gt; has been downloaded as ${currentTag}-example.html`);
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            isThemeDark = !isThemeDark;
+            const button = document.querySelector('.theme-toggle');
+            
+            if (isThemeDark) {
+                button.textContent = '🌙 Dark Mode';
+                document.documentElement.style.setProperty('--dark', '#1a1a1a');
+                document.documentElement.style.setProperty('--light', '#f8f9fa');
+            } else {
+                button.textContent = '☀️ Light Mode';
+                document.documentElement.style.setProperty('--dark', '#f8f9fa');
+                document.documentElement.style.setProperty('--light', '#1a1a1a');
+            }
+        }
+
+        // Update progress bar based on scroll
+        function updateProgressBar() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / scrollHeight) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        // Keyboard navigation
+        function handleKeyboardNavigation(e) {
+            const tags = Object.keys(semanticTags);
+            const currentIndex = tags.indexOf(currentTag);
+
+            switch (e.key) {
+                case 'ArrowUp':
+                    if (e.altKey) {
+                        e.preventDefault();
+                        const prevIndex = currentIndex > 0 ? currentIndex - 1 : tags.length - 1;
+                        loadTag(tags[prevIndex]);
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (e.altKey) {
+                        e.preventDefault();
+                        const nextIndex = currentIndex < tags.length - 1 ? currentIndex + 1 : 0;
+                        loadTag(tags[nextIndex]);
+                    }
+                    break;
+                case 'a':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        animateDemo();
+                    }
+                    break;
+                case 'h':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        toggleHighlight();
+                    }
+                    break;
+                case 'v':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        validateStructure();
+                    }
+                    break;
+                case 'g':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        generateExample();
+                    }
+                    break;
+                case 'Escape':
+                    const notification = document.querySelector('.notification');
+                    if (notification) notification.remove();
+                    break;
+            }
+        }
+
+        // Advanced features
+        class SemanticAnalyzer {
+            static analyzeStructure(htmlString) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlString, 'text/html');
+                const analysis = {
+                    semanticElements: [],
+                    hierarchy: [],
+                    accessibility: [],
+                    seo: []
+                };
+
+                // Find semantic elements
+                const semanticTags = ['header', 'nav', 'main', 'article', 'section', 'aside', 'footer'];
+                semanticTags.forEach(tag => {
+                    const elements = doc.querySelectorAll(tag);
+                    if (elements.length > 0) {
+                        analysis.semanticElements.push({
+                            tag,
+                            count: elements.length,
+                            hasLandmark: this.hasLandmarkRole(elements[0])
+                        });
+                    }
+                });
+
+                return analysis;
+            }
+
+            static hasLandmarkRole(element) {
+                const landmarkRoles = ['banner', 'navigation', 'main', 'contentinfo', 'complementary'];
+                return landmarkRoles.includes(element.getAttribute('role'));
+            }
+
+            static generateSEOInsights(tagType) {
+                const insights = {
+                    section: [
+                        'Sections help search engines understand content organization',
+                        'Each section should focus on a specific topic or theme',
+                        'Use descriptive headings to improve content discovery'
+                    ],
+                    article: [
+                        'Articles are ideal for blog posts and news content',
+                        'Include structured data for rich snippets',
+                        'Use proper heading hierarchy (h1-h6) within articles'
+                    ],
+                    header: [
+                        'Headers should contain primary navigation for crawlability',
+                        'Include site logo and branding for brand recognition',
+                        'Use semantic markup for better search engine understanding'
+                    ],
+                    nav: [
+                        'Navigation elements help search engines understand site structure',
+                        'Use descriptive link text for better accessibility and SEO',
+                        'Implement breadcrumb navigation for complex sites'
+                    ],
+                    main: [
+                        'Main content should contain the primary page topic',
+                        'Ensure main content is substantial and valuable',
+                        'Avoid duplicate main content across pages'
+                    ],
+                    aside: [
+                        'Aside content should be relevant but not essential',
+                        'Use for related links, author bios, and supplementary info',
+                        'Avoid keyword stuffing in aside elements'
+                    ],
+                    footer: [
+                        'Footers should contain important site-wide links',
+                        'Include contact information and business details',
+                        'Add structured data for business information'
+                    ]
+                };
+
+                return insights[tagType] || [];
+            }
+        }
+
+        // Performance monitoring
+        class PerformanceMonitor {
+            static measureRenderTime(callback) {
+                const start = performance.now();
+                callback();
+                const end = performance.now();
+                return end - start;
+            }
+
+            static trackUserInteraction(action, element) {
+                // Simulate analytics tracking
+                console.log(`User interaction: ${action} on ${element}`);
+                
+                // Update interaction counter
+                if (!window.interactionStats) {
+                    window.interactionStats = {};
+                }
+                
+                if (!window.interactionStats[action]) {
+                    window.interactionStats[action] = 0;
+                }
+                
+                window.interactionStats[action]++;
+                this.updateStatsDisplay();
+            }
+
+            static updateStatsDisplay() {
+                // Create or update stats display
+                let statsDisplay = document.getElementById('statsDisplay');
+                if (!statsDisplay) {
+                    statsDisplay = document.createElement('div');
+                    statsDisplay.id = 'statsDisplay';
+                    statsDisplay.style.cssText = `
+                        position: fixed;
+                        bottom: 20px;
+                        right: 20px;
+                        background: var(--glass);
+                        backdrop-filter: blur(20px);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 12px;
+                        padding: 1rem;
+                        font-size: 0.8rem;
+                        z-index: 1000;
+                        max-width: 200px;
+                        opacity: 0.8;
+                    `;
+                    document.body.appendChild(statsDisplay);
+                }
+
+                const stats = window.interactionStats || {};
+                const statsHTML = Object.entries(stats)
+                    .map(([action, count]) => `<div>${action}: ${count}</div>`)
+                    .join('');
+                
+                statsDisplay.innerHTML = `
+                    <div style="color: var(--accent); font-weight: bold; margin-bottom: 0.5rem;">Interactions</div>
+                    ${statsHTML}
+                `;
+            }
+        }
+
+        // Enhanced loading with better UX
+        function enhancedLoadTag(tagKey) {
+            // Track interaction
+            PerformanceMonitor.trackUserInteraction('tagLoad', tagKey);
+            
+            // Measure performance
+            const renderTime = PerformanceMonitor.measureRenderTime(() => {
+                loadTag(tagKey);
+            });
+            
+            console.log(`Tag ${tagKey} loaded in ${renderTime.toFixed(2)}ms`);
+            
+            // Add subtle success feedback
+            const button = document.querySelector(`[onclick="loadTag('${tagKey}')"]`);
+            if (button) {
+                button.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    button.style.transform = '';
+                }, 100);
+            }
+        }
+
+        // Code formatter for better readability
+        function formatCode(code) {
+            let indentLevel = 0;
+            const indentSize = 2;
+            
+            return code
+                .split('\n')
+                .map(line => {
+                    const trimmed = line.trim();
+                    if (!trimmed) return '';
+                    
+                    // Decrease indent for closing tags
+                    if (trimmed.startsWith('</') || trimmed.startsWith('</')) {
+                        indentLevel = Math.max(0, indentLevel - 1);
+                    }
+                    
+                    const indentedLine = ' '.repeat(indentLevel * indentSize) + trimmed;
+                    
+                    // Increase indent for opening tags (but not self-closing)
+                    if (trimmed.startsWith('<') && !trimmed.startsWith('</') && !trimmed.endsWith('/>')) {
+                        indentLevel++;
+                    }
+                    
+                    return indentedLine;
+                })
+                .join('\n');
+        }
+
+        // Accessibility checker
+        function checkAccessibility() {
+            const tag = semanticTags[currentTag];
+            const issues = [];
+            const recommendations = [];
+
+            // Check for common accessibility issues
+            switch (currentTag) {
+                case 'header':
+                    if (!tag.code.includes('role="banner"')) {
+                        issues.push('Missing banner landmark role');
+                    }
+                    if (!tag.code.includes('aria-label')) {
+                        recommendations.push('Consider adding aria-label for multiple headers');
+                    }
+                    break;
+                    
+                case 'nav':
+                    if (!tag.code.includes('aria-label')) {
+                        issues.push('Missing descriptive aria-label');
+                    }
+                    if (!tag.code.includes('aria-current')) {
+                        recommendations.push('Add aria-current for active navigation items');
+                    }
+                    break;
+                    
+                case 'main':
+                    if (!tag.code.includes('tabindex="-1"')) {
+                        recommendations.push('Add tabindex="-1" for skip link functionality');
+                    }
+                    break;
+                    
+                case 'section':
+                    if (!tag.code.includes('aria-labelledby')) {
+                        recommendations.push('Use aria-labelledby to associate with heading');
+                    }
+                    break;
+            }
+
+            const resultsHTML = `
+                ${issues.length > 0 ? '<div style="color: var(--danger);"><strong>Issues:</strong><ul>' + 
+                  issues.map(issue => `<li>${issue}</li>`).join('') + '</ul></div>' : ''}
+                ${recommendations.length > 0 ? '<div style="color: var(--warning);"><strong>Recommendations:</strong><ul>' + 
+                  recommendations.map(rec => `<li>${rec}</li>`).join('') + '</ul></div>' : ''}
+                ${issues.length === 0 && recommendations.length === 0 ? 
+                  '<div style="color: var(--success);">✅ No accessibility issues found!</div>' : ''}
+            `;
+
+            showNotification('Accessibility Check', resultsHTML);
+            PerformanceMonitor.trackUserInteraction('accessibilityCheck', currentTag);
+        }
+
+        // Add new interactive features
+        function addInteractiveFeatures() {
+            // Add context menu for additional options
+            document.addEventListener('contextmenu', (e) => {
+                if (e.target.closest('.visual-demo') || e.target.closest('.code-display')) {
+                    e.preventDefault();
+                    showContextMenu(e.clientX, e.clientY);
+                }
+            });
+
+            // Add copy code functionality
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.code-display')) {
+                    const codeElement = e.target.closest('.code-display');
+                    const code = codeElement.textContent;
+                    navigator.clipboard.writeText(code).then(() => {
+                        showToast('Code copied to clipboard!');
+                    });
+                }
+            });
+        }
+
+        function showContextMenu(x, y) {
+            // Remove existing context menu
+            const existing = document.querySelector('.context-menu');
+            if (existing) existing.remove();
+
+            const menu = document.createElement('div');
+            menu.className = 'context-menu';
+            menu.style.cssText = `
+                position: fixed;
+                top: ${y}px;
+                left: ${x}px;
+                background: var(--glass);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 8px;
+                padding: 0.5rem 0;
+                z-index: 2000;
+                min-width: 150px;
+                box-shadow: var(--shadow);
+            `;
+
+            const menuItems = [
+                { text: 'Copy Code', action: () => copyCurrentCode() },
+                { text: 'Check Accessibility', action: () => checkAccessibility() },
+                { text: 'View SEO Tips', action: () => showSEOTips() },
+                { text: 'Export HTML', action: () => exportCode() }
+            ];
+
+            menuItems.forEach(item => {
+                const menuItem = document.createElement('div');
+                menuItem.style.cssText = `
+                    padding: 0.5rem 1rem;
+                    cursor: pointer;
+                    transition: background-color 0.2s;
+                `;
+                menuItem.textContent = item.text;
+                menuItem.onclick = () => {
+                    item.action();
+                    menu.remove();
+                };
+                menuItem.onmouseenter = () => {
+                    menuItem.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                };
+                menuItem.onmouseleave = () => {
+                    menuItem.style.backgroundColor = 'transparent';
+                };
+                menu.appendChild(menuItem);
+            });
+
+            document.body.appendChild(menu);
+
+            // Remove menu when clicking elsewhere
+            setTimeout(() => {
+                document.addEventListener('click', () => menu.remove(), { once: true });
+            }, 100);
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                right: 20px;
+                background: var(--success);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                z-index: 2000;
+                animation: slideInRight 0.3s ease-out;
+                box-shadow: var(--shadow);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function copyCurrentCode() {
+            const tag = semanticTags[currentTag];
+            navigator.clipboard.writeText(tag.code).then(() => {
+                showToast('Code copied to clipboard!');
+                PerformanceMonitor.trackUserInteraction('copyCode', currentTag);
+            });
+        }
+
+        function showSEOTips() {
+            const insights = SemanticAnalyzer.generateSEOInsights(currentTag);
+            const tipsHTML = insights.map(tip => `<li style="margin-bottom: 0.5rem;">${tip}</li>`).join('');
+            
+            showNotification('SEO Insights', `
+                <div style="margin-bottom: 1rem;">Optimize your &lt;${currentTag}&gt; usage for better search engine visibility:</div>
+                <ul style="padding-left: 1rem;">${tipsHTML}</ul>
+            `);
+            PerformanceMonitor.trackUserInteraction('seoTips', currentTag);
+        }
+
+        // Add CSS animations for new interactions
+        const additionalStyles = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            @keyframes slideInDown {
+                from { transform: translate(-50%, -60%); opacity: 0; }
+                to { transform: translate(-50%, -50%); opacity: 1; }
+            }
+            
+            .code-display {
+                cursor: pointer;
+                position: relative;
+            }
+            
+            .code-display::after {
+                content: 'Click to copy';
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                font-size: 0.7rem;
+                opacity: 0;
+                transition: opacity 0.3s;
+                pointer-events: none;
+            }
+            
+            .code-display:hover::after {
+                opacity: 1;
+            }
+        `;
+
+        // Inject additional styles
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = additionalStyles;
+        document.head.appendChild(styleSheet);
+
+        // Update the existing functions to use enhanced versions
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            addInteractiveFeatures();
+            
+            // Update all loadTag calls to use enhanced version
+            document.querySelectorAll('.tag-button').forEach(button => {
+                const originalOnclick = button.onclick;
+                button.onclick = function() {
+                    const tagKey = originalOnclick.toString().match(/loadTag\('([^']+)'/)[1];
+                    enhancedLoadTag(tagKey);
+                };
+            });
+        });
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+            addInteractiveFeatures();
+        }
+    </script>
+</body>
+</html>
