@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Semantic Tag Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1877f2;
+            --secondary: #42b883;
+            --accent: #ff6b6b;
+            --dark: #1a1a1a;
+            --light: #f8f9fa;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.05);
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, var(--accent), transparent 70%);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.6; transform: translateX(-50%) scale(1.2); }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #fff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .sidebar {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            position: sticky;
+            top: 2rem;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+            font-size: 1.3rem;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .tag-button {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .tag-button:hover::before {
+            left: 100%;
+        }
+
+        .tag-button:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .tag-button.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .content-area {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            min-height: 600px;
+        }
+
+        .tag-demo {
+            display: none;
+        }
+
+        .tag-demo.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .demo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .demo-title {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-description {
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            max-width: 800px;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 0.3rem;
+            gap: 0.3rem;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .toggle-btn.active {
+            background: var(--primary);
+        }
+
+        .demo-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .demo-content.split-view {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .visual-demo {
+            background: white;
+            color: var(--dark);
+            border-radius: 15px;
+            padding: 2rem;
+            min-height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visual-demo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+
+        .code-demo {
+            background: #1e1e1e;
+            border-radius: 15px;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .code-header {
+            background: #2d2d2d;
+            padding: 1rem;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.red { background: #ff5f57; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #28ca42; }
+
+        .code-title {
+            margin-left: 1rem;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .code-content {
+            padding: 2rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #f8f8f2;
+            overflow-x: auto;
+        }
+
+        .code-content pre {
+            margin: 0;
+        }
+
+        .highlight {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            animation: highlight 2s ease-in-out infinite;
+        }
+
+        @keyframes highlight {
+            0%, 100% { background: rgba(255, 255, 255, 0.1); }
+            50% { background: rgba(66, 184, 131, 0.3); }
+        }
+
+        .syntax-keyword { color: #ff79c6; }
+        .syntax-tag { color: #8be9fd; }
+        .syntax-attr { color: #50fa7b; }
+        .syntax-string { color: #f1fa8c; }
+        .syntax-comment { color: #6272a4; }
+
+        .usage-examples {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .example-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .example-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .example-title {
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 25px;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-tag {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-tag.active {
+            background: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: relative;
+                max-height: none;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .demo-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .view-toggle {
+                align-self: flex-end;
+            }
+            
+            .demo-content.split-view {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .accessibility-info {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .accessibility-title {
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .performance-tip {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .performance-title {
+            color: #ffc107;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>HTML Semantic Tag Explorer</h1>
+            <p class="subtitle">Master semantic HTML with interactive visualizations and real-world examples</p>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="totalTags">15</div>
+                    <div>Semantic Tags</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="viewCount">0</div>
+                    <div>Views</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">A11Y</div>
+                    <div>Accessible</div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <aside class="sidebar">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search semantic tags..." id="searchInput">
+                    <span class="search-icon">🔍</span>
+                </div>
+                
+                <div class="filter-tags">
+                    <span class="filter-tag active" data-category="all">All</span>
+                    <span class="filter-tag" data-category="structure">Structure</span>
+                    <span class="filter-tag" data-category="content">Content</span>
+                    <span class="filter-tag" data-category="form">Forms</span>
+                </div>
+
+                <h3>Semantic Tags</h3>
+                <div class="tag-list" id="tagList">
+                    <!-- Tags will be populated by JavaScript -->
+                </div>
+            </aside>
+
+            <section class="content-area">
+                <div id="demoContainer">
+                    <!-- Demo content will be populated by JavaScript -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const semanticTags = {
+            header: {
+                category: 'structure',
+                title: '<header>',
+                description: 'Represents introductory content, typically containing navigation aids, logos, or headings.',
+                usage: 'Use for page headers, article headers, or section introductions.',
+                code: `<header>
+  <nav>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+  <h1>Welcome to Our Website</h1>
+</header>`,
+                visual: `<header style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+  <nav style="margin-bottom: 1rem;">
+    <ul style="display: flex; list-style: none; gap: 1rem; margin: 0; padding: 0;">
+      <li><a href="#" style="color: #007bff; text-decoration: none;">Home</a></li>
+      <li><a href="#" style="color: #007bff; text-decoration: none;">About</a></li>
+      <li><a href="#" style="color: #007bff; text-decoration: none;">Contact</a></li>
+    </ul>
+  </nav>
+  <h1 style="margin: 0; color: #333;">Welcome to Our Website</h1>
+</header>`,
+                examples: [
+                    { title: 'Page Header', desc: 'Main site header with navigation' },
+                    { title: 'Article Header', desc: 'Header for blog posts or articles' },
+                    { title: 'Section Header', desc: 'Header for content sections' }
+                ],
+                accessibility: 'Provides landmark navigation for screen readers. Use only one main header per page.',
+                performance: 'Place critical navigation and branding here for immediate user orientation.'
+            },
+            nav: {
+                category: 'structure',
+                title: '<nav>',
+                description: 'Defines a set of navigation links for the current document or other documents.',
+                usage: 'Use for primary navigation, breadcrumbs, pagination, or table of contents.',
+                code: `<nav aria-label="Main navigation">
+  <ul>
+    <li><a href="/" aria-current="page">Home</a></li>
+    <li><a href="/products">Products</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/contact">Contact</a></li>
+  </ul>
+</nav>`,
+                visual: `<nav style="background: #e9ecef; padding: 1rem; border-radius: 8px; border-left: 4px solid #007bff;">
+  <ul style="display: flex; list-style: none; gap: 1.5rem; margin: 0; padding: 0;">
+    <li><a href="#" style="color: #007bff; text-decoration: none; font-weight: bold; padding: 0.5rem 1rem; background: #fff; border-radius: 5px;">Home</a></li>
+    <li><a href="#" style="color: #6c757d; text-decoration: none; padding: 0.5rem 1rem;">Products</a></li>
+    <li><a href="#" style="color: #6c757d; text-decoration: none; padding: 0.5rem 1rem;">About</a></li>
+    <li><a href="#" style="color: #6c757d; text-decoration: none; padding: 0.5rem 1rem;">Contact</a></li>
+  </ul>
+</nav>`,
+                examples: [
+                    { title: 'Primary Navigation', desc: 'Main site navigation menu' },
+                    { title: 'Breadcrumbs', desc: 'Shows current page location' },
+                    { title: 'Pagination', desc: 'Navigate between pages of content' }
+                ],
+                accessibility: 'Use aria-label to distinguish between multiple nav elements. Mark current page with aria-current.',
+                performance: 'Keep navigation lightweight and prioritize mobile-first responsive design.'
+            },
+            main: {
+                category: 'structure',
+                title: '<main>',
+                description: 'Represents the dominant content of the document. Should be unique to the document.',
+                usage: 'Use once per page for the primary content area, excluding headers, footers, and sidebars.',
+                code: `<main>
+  <h1>Article Title</h1>
+  <article>
+    <p>This is the main content of the page...</p>
+  </article>
+</main>`,
+                visual: `<main style="background: #fff; padding: 2rem; border-radius: 8px; border: 2px solid #28a745; min-height: 200px;">
+  <h1 style="color: #333; margin-bottom: 1rem;">Main Content Area</h1>
+  <article style="background: #f8f9fa; padding: 1rem; border-radius: 5px;">
+    <p style="margin: 0; color: #666;">This represents the primary content of your webpage. Only use one main element per page.</p>
+  </article>
+</main>`,
+                examples: [
+                    { title: 'Blog Post', desc: 'Main content area for articles' },
+                    { title: 'Product Page', desc: 'Product details and information' },
+                    { title: 'Landing Page', desc: 'Primary value proposition content' }
+                ],
+                accessibility: 'Essential landmark for screen readers to skip to main content. Use skip links.',
+                performance: 'Contains your most important content - optimize for Core Web Vitals here.'
+            },
+            section: {
+                category: 'structure',
+                title: '<section>',
+                description: 'Represents a standalone section of content that would make sense listed in an outline.',
+                usage: 'Use for thematically related content that has a natural heading.',
+                code: `<section>
+  <h2>About Our Services</h2>
+  <p>We provide comprehensive solutions...</p>
+  <ul>
+    <li>Web Development</li>
+    <li>Mobile Apps</li>
+    <li>Consulting</li>
+  </ul>
+</section>`,
+                visual: `<section style="background: #e3f2fd; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #2196f3;">
+  <h2 style="color: #1976d2; margin-bottom: 1rem;">About Our Services</h2>
+  <p style="color: #424242; margin-bottom: 1rem;">We provide comprehensive solutions for modern businesses.</p>
+  <ul style="color: #424242; padding-left: 1.5rem;">
+    <li>Web Development</li>
+    <li>Mobile Apps</li>
+    <li>Consulting</li>
+  </ul>
+</section>`,
+                examples: [
+                    { title: 'Feature Section', desc: 'Group related features together' },
+                    { title: 'Chapter Section', desc: 'Sections in long-form content' },
+                    { title: 'Product Categories', desc: 'Group products by category' }
+                ],
+                accessibility: 'Each section should have a heading for proper document outline.',
+                performance: 'Use sections to organize content for better user scanning and SEO.'
+            },
+            article: {
+                category: 'content',
+                title: '<article>',
+                description: 'Represents a complete, self-contained composition that could be distributed independently.',
+                usage: 'Use for blog posts, news articles, forum posts, or any standalone content.',
+                code: `<article>
+  <header>
+    <h1>Understanding Semantic HTML</h1>
+    <time datetime="2024-01-15">January 15, 2024</time>
+    <address>By <a href="/author/jane">Jane Doe</a></address>
+  </header>
+  <p>Semantic HTML provides meaning to web content...</p>
+  <footer>
+    <p>Tags: HTML, Web Development</p>
+  </footer>
+</article>`,
+                visual: `<article style="background: #fff3e0; padding: 1.5rem; border-radius: 8px; border: 1px solid #ffb74d;">
+  <header style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #ffcc02;">
+    <h1 style="color: #e65100; margin-bottom: 0.5rem; font-size: 1.5rem;">Understanding Semantic HTML</h1>
+    <time style="color: #f57c00;">January 15, 2024</time>
+    <address style="color: #ef6c00; font-style: normal; margin-top: 0.5rem;">By <a href="#" style="color: #e65100;">Jane Doe</a></address>
+  </header>
+  <p style="color: #424242; margin-bottom: 1rem;">Semantic HTML provides meaning to web content and improves accessibility...</p>
+  <footer style="border-top: 1px solid #ffcc02; padding-top: 1rem;">
+    <p style="color: #f57c00; margin: 0; font-size: 0.9rem;">Tags: HTML, Web Development</p>
+  </footer>
+</article>`,
+                examples: [
+                    { title: 'Blog Post', desc: 'Complete blog article with metadata' },
+                    { title: 'News Article', desc: 'Journalistic content piece' },
+                    { title: 'Forum Post', desc: 'User-generated content in forums' }
+                ],
+                accessibility: 'Articles create natural reading landmarks and can be navigated independently.',
+                performance: 'Search engines better understand article content for featured snippets.'
+            },
+            aside: {
+                category: 'content',
+                title: '<aside>',
+                description: 'Represents content tangentially related to the main content, like sidebars or callouts.',
+                usage: 'Use for sidebars, pull quotes, advertisements, or supplementary information.',
+                code: `<aside>
+  <h3>Related Articles</h3>
+  <ul>
+    <li><a href="/html-basics">HTML Basics</a></li>
+    <li><a href="/css-guide">CSS Guide</a></li>
+    <li><a href="/js-intro">JavaScript Intro</a></li>
+  </ul>
+</aside>`,
+                visual: `<aside style="background: #f3e5f5; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #9c27b0; width: 100%; margin: 1rem 0;">
+  <h3 style="color: #7b1fa2; margin-bottom: 1rem; font-size: 1.2rem;">Related Articles</h3>
+  <ul style="list-style: none; padding: 0; margin: 0;">
+    <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #8e24aa; text-decoration: none;">→ HTML Basics</a></li>
+    <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #8e24aa; text-decoration: none;">→ CSS Guide</a></li>
+    <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #8e24aa; text-decoration: none;">→ JavaScript Intro</a></li>
+  </ul>
+</aside>`,
+                examples: [
+                    { title: 'Sidebar Content', desc: 'Secondary navigation or information' },
+                    { title: 'Pull Quotes', desc: 'Highlighted quotes from main content' },
+                    { title: 'Advertisements', desc: 'Promotional content separate from main flow' }
+                ],
+                accessibility: 'Clearly distinguishes supplementary content from main content flow.',
+                performance: 'Use for non-critical content that can be lazy-loaded or deprioritized.'
+            },
+            footer: {
+                category: 'structure',
+                title: '<footer>',
+                description: 'Represents footer information for its nearest sectioning content or sectioning root.',
+                usage: 'Use for copyright info, contact details, related links, or author information.',
+                code: `<footer>
+  <div class="footer-content">
+    <p>&copy; 2024 Company Name. All rights reserved.</p>
+    <nav>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+      <a href="/contact">Contact Us</a>
+    </nav>
+  </div>
+</footer>`,
+                visual: `<footer style="background: #37474f; color: white; padding: 2rem; border-radius: 8px; margin-top: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <p style="margin: 0;">&copy; 2024 Company Name. All rights reserved.</p>
+    <nav style="display: flex; gap: 1rem;">
+      <a href="#" style="color: #90caf9; text-decoration: none;">Privacy Policy</a>
+      <a href="#" style="color: #90caf9; text-decoration: none;">Terms of Service</a>
+      <a href="#" style="color: #90caf9; text-decoration: none;">Contact Us</a>
+    </nav>
+  </div>
+</footer>`,
+                examples: [
+                    { title: 'Site Footer', desc: 'Main website footer with links and copyright' },
+                    { title: 'Article Footer', desc: 'Author bio and article metadata' },
+                    { title: 'Section Footer', desc: 'Summary or conclusion for a section' }
+                ],
+                accessibility: 'Provides consistent location for important site information and legal requirements.',
+                performance: 'Often contains non-critical content that can be deferred or lazy-loaded.'
+            },
+            figure: {
+                category: 'content',
+                title: '<figure>',
+                description: 'Represents self-contained content, frequently with a caption, referenced as a single unit.',
+                usage: 'Use for images, diagrams, code listings, or any content with captions.',
+                code: `<figure>
+  <img src="chart.png" alt="Sales growth chart">
+  <figcaption>
+    Sales have increased by 40% this quarter
+  </figcaption>
+</figure>`,
+                visual: `<figure style="background: #f5f5f5; padding: 1.5rem; border-radius: 8px; text-align: center; margin: 1rem 0; border: 2px solid #ddd;">
+  <div style="background: #e3f2fd; height: 150px; border-radius: 5px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; color: #1976d2; font-size: 1.2rem;">
+    📊 Sales Growth Chart
+  </div>
+  <figcaption style="color: #666; font-style: italic; font-size: 0.9rem;">
+    Sales have increased by 40% this quarter
+  </figcaption>
+</figure>`,
+                examples: [
+                    { title: 'Image with Caption', desc: 'Photos with descriptive text' },
+                    { title: 'Code Snippet', desc: 'Code examples with explanations' },
+                    { title: 'Infographic', desc: 'Data visualizations with context' }
+                ],
+                accessibility: 'Links visual content with its description, improving context for all users.',
+                performance: 'Groups related content for better layout stability and lazy loading.'
+            },
+            time: {
+                category: 'content',
+                title: '<time>',
+                description: 'Represents a specific period in time or a range of time.',
+                usage: 'Use for dates, times, durations, or any temporal information.',
+                code: `<article>
+  <h2>Product Launch</h2>
+  <p>Published on <time datetime="2024-03-15T10:30:00">March 15, 2024 at 10:30 AM</time></p>
+  <p>Event duration: <time datetime="PT2H30M">2 hours 30 minutes</time></p>
+</article>`,
+                visual: `<article style="background: #fff; padding: 1.5rem; border-radius: 8px; border: 1px solid #ddd;">
+  <h2 style="color: #333; margin-bottom: 1rem;">Product Launch</h2>
+  <p style="color: #666; margin-bottom: 0.5rem;">Published on <time style="background: #e8f5e8; padding: 0.2rem 0.5rem; border-radius: 3px; color: #2e7d32; font-weight: bold;" datetime="2024-03-15T10:30:00">March 15, 2024 at 10:30 AM</time></p>
+  <p style="color: #666; margin: 0;">Event duration: <time style="background: #fff3e0; padding: 0.2rem 0.5rem; border-radius: 3px; color: #f57c00; font-weight: bold;" datetime="PT2H30M">2 hours 30 minutes</time></p>
+</article>`,
+                examples: [
+                    { title: 'Publication Date', desc: 'When content was published' },
+                    { title: 'Event Schedule', desc: 'Meeting times and durations' },
+                    { title: 'Historical Dates', desc: 'Important dates in content' }
+                ],
+                accessibility: 'Machine-readable datetime attribute helps assistive technologies parse dates.',
+                performance: 'Enables rich snippets in search results with structured date information.'
+            },
+            address: {
+                category: 'content',
+                title: '<address>',
+                description: 'Represents contact information for a person, organization, or article author.',
+                usage: 'Use for contact details, not for postal addresses in content.',
+                code: `<address>
+  <strong>Contact Us:</strong><br>
+  Email: <a href="mailto:info@company.com">info@company.com</a><br>
+  Phone: <a href="tel:+1234567890">(123) 456-7890</a><br>
+  Address: 123 Main St, City, State 12345
+</address>`,
+                visual: `<address style="background: #f8f4e6; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ffa726; font-style: normal; line-height: 1.6;">
+  <strong style="color: #e65100;">Contact Us:</strong><br>
+  Email: <a href="mailto:info@company.com" style="color: #d84315; text-decoration: none;">info@company.com</a><br>
+  Phone: <a href="tel:+1234567890" style="color: #d84315; text-decoration: none;">(123) 456-7890</a><br>
+  <span style="color: #5d4037;">Address: 123 Main St, City, State 12345</span>
+</address>`,
+                examples: [
+                    { title: 'Author Contact', desc: 'Contact info for article authors' },
+                    { title: 'Business Details', desc: 'Company contact information' },
+                    { title: 'Support Info', desc: 'Customer service contact details' }
+                ],
+                accessibility: 'Clearly identifies contact information for screen reader users.',
+                performance: 'Structured contact data can appear in local search results.'
+            },
+            details: {
+                category: 'content',
+                title: '<details>',
+                description: 'Creates a disclosure widget where information is visible only when toggled open.',
+                usage: 'Use for FAQs, expandable content, or progressive disclosure patterns.',
+                code: `<details>
+  <summary>What is semantic HTML?</summary>
+  <p>Semantic HTML uses meaningful tags that describe the content's purpose and structure, making web pages more accessible and SEO-friendly.</p>
+</details>`,
+                visual: `<details style="background: #f1f8e9; border: 1px solid #8bc34a; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+  <summary style="font-weight: bold; color: #558b2f; cursor: pointer; padding: 0.5rem; margin: -0.5rem; border-radius: 5px; list-style: none;">
+    ▶ What is semantic HTML?
+  </summary>
+  <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #c8e6c9; color: #2e7d32;">
+    Semantic HTML uses meaningful tags that describe the content's purpose and structure, making web pages more accessible and SEO-friendly.
+  </div>
+</details>`,
+                examples: [
+                    { title: 'FAQ Section', desc: 'Expandable frequently asked questions' },
+                    { title: 'Code Examples', desc: 'Collapsible code snippets' },
+                    { title: 'Progressive Disclosure', desc: 'Show details on demand' }
+                ],
+                accessibility: 'Built-in keyboard navigation and screen reader support for expandable content.',
+                performance: 'Reduces initial page weight by hiding secondary content until needed.'
+            },
+            summary: {
+                category: 'content',
+                title: '<summary>',
+                description: 'Specifies a visible heading for the details element that users can click to open/close.',
+                usage: 'Use as the first child of details element to provide a clickable summary.',
+                code: `<details>
+  <summary>Advanced Settings</summary>
+  <form>
+    <label>API Key: <input type="text" name="api"></label>
+    <label>Timeout: <input type="number" name="timeout"></label>
+  </form>
+</details>`,
+                visual: `<details style="background: #e8eaf6; border: 1px solid #5c6bc0; border-radius: 8px; padding: 1rem;">
+  <summary style="font-weight: bold; color: #3f51b5; cursor: pointer; padding: 0.5rem; margin: -0.5rem; border-radius: 5px; background: #c5cae9; list-style: none;">
+    ⚙️ Advanced Settings
+  </summary>
+  <form style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #9fa8da;">
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; color: #3f51b5; margin-bottom: 0.5rem;">API Key:</label>
+      <input type="text" style="width: 100%; padding: 0.5rem; border: 1px solid #9fa8da; border-radius: 4px;">
+    </div>
+    <div>
+      <label style="display: block; color: #3f51b5; margin-bottom: 0.5rem;">Timeout (ms):</label>
+      <input type="number" style="width: 100%; padding: 0.5rem; border: 1px solid #9fa8da; border-radius: 4px;">
+    </div>
+  </form>
+</details>`,
+                examples: [
+                    { title: 'Settings Panel', desc: 'Collapsible configuration options' },
+                    { title: 'Help Sections', desc: 'Expandable help and documentation' },
+                    { title: 'Content Preview', desc: 'Show preview with option to expand' }
+                ],
+                accessibility: 'Provides semantic meaning to collapsible content headers.',
+                performance: 'Native browser implementation is more performant than JavaScript alternatives.'
+            },
+            mark: {
+                category: 'content',
+                title: '<mark>',
+                description: 'Represents text highlighted for reference purposes due to its relevance.',
+                usage: 'Use for search results highlighting, important text, or relevant passages.',
+                code: `<p>Search results for "semantic HTML":</p>
+<article>
+  <h3>Understanding <mark>Semantic HTML</mark></h3>
+  <p><mark>Semantic HTML</mark> elements provide meaning to content structure...</p>
+</article>`,
+                visual: `<div style="background: #fff; padding: 1.5rem; border-radius: 8px; border: 1px solid #ddd;">
+  <p style="color: #666; margin-bottom: 1rem;">Search results for "semantic HTML":</p>
+  <article style="background: #f8f9fa; padding: 1rem; border-radius: 5px;">
+    <h3 style="color: #333; margin-bottom: 0.5rem;">Understanding <mark style="background: #ffeb3b; padding: 0.1rem 0.3rem; border-radius: 2px;">Semantic HTML</mark></h3>
+    <p style="color: #666; margin: 0;"><mark style="background: #ffeb3b; padding: 0.1rem 0.3rem; border-radius: 2px;">Semantic HTML</mark> elements provide meaning to content structure...</p>
+  </article>
+</div>`,
+                examples: [
+                    { title: 'Search Highlighting', desc: 'Highlight search terms in results' },
+                    { title: 'Quote References', desc: 'Mark relevant text in quotations' },
+                    { title: 'Important Notes', desc: 'Highlight key information' }
+                ],
+                accessibility: 'Screen readers can announce highlighted text with proper emphasis.',
+                performance: 'Lightweight semantic highlighting without requiring JavaScript.'
+            },
+            dialog: {
+                category: 'content',
+                title: '<dialog>',
+                description: 'Represents a dialog box or interactive component like a modal or popup.',
+                usage: 'Use for modals, popups, alerts, or any overlay interface elements.',
+                code: `<dialog id="confirmDialog" aria-labelledby="dialog-title">
+  <form method="dialog">
+    <h2 id="dialog-title">Confirm Action</h2>
+    <p>Are you sure you want to delete this item?</p>
+    <button value="cancel">Cancel</button>
+    <button value="confirm" autofocus>Confirm</button>
+  </form>
+</dialog>`,
+                visual: `<div style="position: relative; background: #f5f5f5; padding: 2rem; border-radius: 8px; text-align: center;">
+  <div style="background: rgba(0,0,0,0.5); position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+    <dialog open style="background: white; border: none; border-radius: 12px; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-width: 400px;">
+      <h2 style="color: #333; margin-bottom: 1rem; font-size: 1.3rem;">Confirm Action</h2>
+      <p style="color: #666; margin-bottom: 1.5rem;">Are you sure you want to delete this item?</p>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button style="background: #6c757d; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Cancel</button>
+        <button style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Confirm</button>
+      </div>
+    </dialog>
+  </div>
+</div>`,
+                examples: [
+                    { title: 'Confirmation Modal', desc: 'Confirm destructive actions' },
+                    { title: 'Login Dialog', desc: 'Authentication forms' },
+                    { title: 'Settings Panel', desc: 'Configuration interfaces' }
+                ],
+                accessibility: 'Built-in focus management and ESC key handling for modal interactions.',
+                performance: 'Native modal implementation with better performance than custom solutions.'
+            }
+        };
+
+        let currentTag = 'header';
+        let viewCount = 0;
+        let currentView = 'split';
+
+        function initializeApp() {
+            renderTagList();
+            showTagDemo(currentTag);
+            setupEventListeners();
+            updateStats();
+        }
+
+        function renderTagList() {
+            const tagList = document.getElementById('tagList');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const activeCategory = document.querySelector('.filter-tag.active').dataset.category;
+            
+            tagList.innerHTML = '';
+            
+            Object.keys(semanticTags).forEach(tagKey => {
+                const tag = semanticTags[tagKey];
+                const matchesSearch = tag.title.toLowerCase().includes(searchTerm) || 
+                                    tag.description.toLowerCase().includes(searchTerm);
+                const matchesCategory = activeCategory === 'all' || tag.category === activeCategory;
+                
+                if (matchesSearch && matchesCategory) {
+                    const button = document.createElement('button');
+                    button.className = `tag-button ${tagKey === currentTag ? 'active' : ''}`;
+                    button.textContent = tag.title;
+                    button.onclick = () => selectTag(tagKey);
+                    tagList.appendChild(button);
+                }
+            });
+        }
+
+        function selectTag(tagKey) {
+            currentTag = tagKey;
+            viewCount++;
+            updateStats();
+            
+            // Update active button
+            document.querySelectorAll('.tag-button').forEach(btn => btn.classList.remove('active'));
+            
+            // Find the clicked button and activate it
+            const buttons = Array.from(document.querySelectorAll('.tag-button'));
+            const clickedButton = buttons.find(btn => btn.textContent === semanticTags[tagKey].title);
+            if (clickedButton) {
+                clickedButton.classList.add('active');
+            }
+            
+            showTagDemo(tagKey);
+        }
+
+        function showTagDemo(tagKey) {
+            const tag = semanticTags[tagKey];
+            const container = document.getElementById('demoContainer');
+            
+            container.innerHTML = `
+                <div class="tag-demo active">
+                    <div class="demo-header">
+                        <div>
+                            <h2 class="demo-title">${tag.title}</h2>
+                            <p class="demo-description">${tag.description}</p>
+                        </div>
+                        <div class="view-toggle">
+                            <button class="toggle-btn ${currentView === 'visual' ? 'active' : ''}" onclick="setView('visual')">Visual</button>
+                            <button class="toggle-btn ${currentView === 'code' ? 'active' : ''}" onclick="setView('code')">Code</button>
+                            <button class="toggle-btn ${currentView === 'split' ? 'active' : ''}" onclick="setView('split')">Both</button>
+                        </div>
+                    </div>
+                    
+                    <div class="demo-content ${currentView === 'split' ? 'split-view' : ''}">
+                        ${currentView !== 'code' ? `
+                            <div class="visual-demo">
+                                ${tag.visual}
+                            </div>
+                        ` : ''}
+                        
+                        ${currentView !== 'visual' ? `
+                            <div class="code-demo">
+                                <div class="code-header">
+                                    <div class="code-dots">
+                                        <span class="dot red"></span>
+                                        <span class="dot yellow"></span>
+                                        <span class="dot green"></span>
+                                    </div>
+                                    <span class="code-title">${tag.title.toLowerCase()}.html</span>
+                                </div>
+                                <div class="code-content">
+                                    <pre>${highlightSyntax(tag.code)}</pre>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="usage-examples">
+                        ${tag.examples.map(example => `
+                            <div class="example-card">
+                                <div class="example-title">${example.title}</div>
+                                <div>${example.desc}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="accessibility-info">
+                        <div class="accessibility-title">
+                            ♿ Accessibility Benefits
+                        </div>
+                        <p>${tag.accessibility}</p>
+                    </div>
+
+                    <div class="performance-tip">
+                        <div class="performance-title">
+                            ⚡ Performance Impact
+                        </div>
+                        <p>${tag.performance}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function highlightSyntax(code) {
+            return code
+                .replace(/(&lt;\/?)(\w+)([^&gt;]*&gt;)/g, '$1<span class="syntax-tag">$2</span>$3')
+                .replace(/(\w+)=/g, '<span class="syntax-attr">$1</span>=')
+                .replace(/"([^"]*)"/g, '"<span class="syntax-string">$1</span>"')
+                .replace(/(&lt;!--.*?--&gt;)/g, '<span class="syntax-comment">$1</span>')
+                .replace(/(class|id|href|src|alt|datetime|aria-\w+)/g, '<span class="syntax-keyword">$1</span>');
+        }
+
+        function setView(view) {
+            currentView = view;
+            showTagDemo(currentTag);
+        }
+
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', renderTagList);
+            
+            // Filter functionality
+            document.querySelectorAll('.filter-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    renderTagList();
+                });
+            });
+
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    const buttons = Array.from(document.querySelectorAll('.tag-button'));
+                    const currentIndex = buttons.findIndex(btn => btn.classList.contains('active'));
+                    
+                    if (currentIndex !== -1) {
+                        const nextIndex = e.key === 'ArrowUp' 
+                            ? Math.max(0, currentIndex - 1)
+                            : Math.min(buttons.length - 1, currentIndex + 1);
+                        
+                        buttons[nextIndex].click();
+                        e.preventDefault();
+                    }
+                }
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('viewCount').textContent = viewCount;
+            document.getElementById('totalTags').textContent = Object.keys(semanticTags).length;
+            
+            // Animate counter
+            const counter = document.getElementById('viewCount');
+            counter.style.transform = 'scale(1.2)';
+            counter.style.color = '#42b883';
+            setTimeout(() => {
+                counter.style.transform = 'scale(1)';
+                counter.style.color = '#42b883';
+            }, 200);
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
