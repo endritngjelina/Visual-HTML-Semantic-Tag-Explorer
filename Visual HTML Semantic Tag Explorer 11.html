@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Semantic Tag Explorer | Professional Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1877f2;
+            --secondary-blue: #42a5f5;
+            --accent-green: #42b883;
+            --dark-bg: #18191a;
+            --card-bg: #242526;
+            --text-primary: #e4e6ea;
+            --text-secondary: #b0b3b8;
+            --border-color: #3a3b3c;
+            --success-green: #4ade80;
+            --warning-orange: #fb923c;
+            --error-red: #f87171;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: var(--gradient-primary);
+            padding: 2rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="0,0 1000,0 1000,60 0,100"/></svg>');
+            background-size: cover;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: slideInFromTop 0.8s ease-out;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            animation: slideInFromTop 0.8s ease-out 0.2s both;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            min-height: calc(100vh - 200px);
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-color);
+        }
+
+        .sidebar h3 {
+            color: var(--secondary-blue);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .tag-list {
+            list-style: none;
+        }
+
+        .tag-item {
+            background: var(--dark-bg);
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .tag-item:hover::before {
+            left: 100%;
+        }
+
+        .tag-item:hover {
+            transform: translateX(5px);
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 15px rgba(24, 119, 242, 0.3);
+        }
+
+        .tag-item.active {
+            border-color: var(--accent-green);
+            background: linear-gradient(135deg, rgba(66, 184, 131, 0.1), rgba(66, 184, 131, 0.05));
+            transform: translateX(5px);
+        }
+
+        .tag-button {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .tag-button:hover {
+            color: var(--secondary-blue);
+        }
+
+        .content-area {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 1.5rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toggle-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toggle-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            transition: all 0.4s ease;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+
+        .toggle-btn:hover::before {
+            width: 200%;
+            height: 200%;
+        }
+
+        .toggle-btn:hover {
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .toggle-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .toggle-btn.active {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .speed-slider {
+            width: 120px;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--secondary-blue);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            height: 600px;
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .panel-header {
+            background: var(--gradient-secondary);
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow: auto;
+        }
+
+        .visual-demo {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: var(--dark-bg);
+            min-height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-editor {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #d4d4d4;
+            white-space: pre-wrap;
+            overflow: auto;
+            max-height: 400px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tag-info {
+            background: var(--dark-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .tag-info h3 {
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .tag-info p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .tag-attributes {
+            margin-top: 1rem;
+        }
+
+        .tag-attributes h4 {
+            color: var(--secondary-blue);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .attribute-list {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .attribute-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .attribute-item:last-child {
+            border-bottom: none;
+        }
+
+        .attribute-name {
+            font-family: 'Courier New', monospace;
+            color: var(--warning-orange);
+            font-weight: 600;
+        }
+
+        .attribute-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: right;
+            max-width: 60%;
+        }
+
+        .demo-element {
+            animation: fadeInScale 0.6s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        .demo-element:hover {
+            transform: scale(1.02);
+        }
+
+        .syntax-highlight .tag {
+            color: #569cd6;
+        }
+
+        .syntax-highlight .attribute {
+            color: #9cdcfe;
+        }
+
+        .syntax-highlight .value {
+            color: #ce9178;
+        }
+
+        .syntax-highlight .content {
+            color: #d4d4d4;
+        }
+
+        .accessibility-info {
+            background: linear-gradient(135deg, rgba(66, 184, 131, 0.1), rgba(66, 184, 131, 0.05));
+            border: 1px solid var(--accent-green);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .accessibility-info h4 {
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .accessibility-info ul {
+            color: var(--text-secondary);
+            padding-left: 1.5rem;
+        }
+
+        .best-practices {
+            background: linear-gradient(135deg, rgba(251, 146, 60, 0.1), rgba(251, 146, 60, 0.05));
+            border: 1px solid var(--warning-orange);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .best-practices h4 {
+            color: var(--warning-orange);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .performance-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--dark-bg);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .performance-indicator.excellent {
+            color: var(--success-green);
+            border: 1px solid var(--success-green);
+        }
+
+        .performance-indicator.good {
+            color: var(--warning-orange);
+            border: 1px solid var(--warning-orange);
+        }
+
+        .loading-skeleton {
+            background: linear-gradient(90deg, var(--border-color) 25%, var(--card-bg) 50%, var(--border-color) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+            border-radius: 8px;
+            height: 20px;
+            margin: 0.5rem 0;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .panel {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        .floating-tooltip {
+            position: absolute;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-soft);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            max-width: 250px;
+        }
+
+        .floating-tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--secondary-blue);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .copy-button:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .status-indicator {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--success-green);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: var(--shadow-soft);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+
+        .status-indicator.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>HTML Semantic Tag Explorer</h1>
+            <p>Professional Interactive Learning Platform</p>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <h3>📋 Semantic Tags</h3>
+            <ul class="tag-list" id="tagList">
+                <!-- Tags will be populated by JavaScript -->
+            </ul>
+        </aside>
+
+        <main class="content-area">
+            <div class="controls">
+                <div class="control-group">
+                    <button class="toggle-btn" id="animationToggle">
+                        <span>🎬 Animations</span>
+                    </button>
+                    <button class="toggle-btn" id="accessibilityMode">
+                        <span>♿ A11y Mode</span>
+                    </button>
+                </div>
+                <div class="speed-control">
+                    <label for="animationSpeed">Speed:</label>
+                    <input type="range" id="animationSpeed" class="speed-slider" min="0.5" max="3" step="0.5" value="1">
+                    <span id="speedValue">1x</span>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        🎨 Visual Demo
+                        <span class="performance-indicator excellent" id="performanceIndicator">
+                            ⚡ Excellent
+                        </span>
+                    </div>
+                    <div class="panel-content">
+                        <div class="visual-demo" id="visualDemo">
+                            <div class="loading-skeleton"></div>
+                            <div class="loading-skeleton" style="width: 70%;"></div>
+                            <div class="loading-skeleton" style="width: 90%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        💻 Code View
+                        <button class="copy-button" id="copyButton">📋 Copy</button>
+                    </div>
+                    <div class="panel-content">
+                        <div class="code-editor syntax-highlight" id="codeEditor">
+                            <!-- Code will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="floating-tooltip" id="tooltip"></div>
+    <div class="status-indicator" id="statusIndicator">Code copied to clipboard!</div>
+
+    <script>
+        class SemanticTagExplorer {
+            constructor() {
+                this.currentTag = 'header';
+                this.animationsEnabled = true;
+                this.accessibilityMode = false;
+                this.animationSpeed = 1;
+                
+                this.semanticTags = {
+                    header: {
+                        name: 'header',
+                        description: 'Represents introductory content, typically containing navigation aids, logos, or headings.',
+                        attributes: {
+                            'role': 'Defines the element\'s purpose for accessibility',
+                            'aria-label': 'Provides accessible name when visible text is insufficient'
+                        },
+                        accessibility: [
+                            'Automatically has "banner" role when direct child of body',
+                            'Should contain site navigation or page heading information',
+                            'Multiple headers allowed but should be semantically distinct'
+                        ],
+                        bestPractices: [
+                            'Use only one main header per page as direct child of body',
+                            'Include primary navigation and branding elements',
+                            'Avoid nesting header elements unnecessarily'
+                        ],
+                        example: `<header role="banner">
+    <nav aria-label="Main navigation">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+    </nav>
+    <h1>Welcome to Our Website</h1>
+</header>`,
+                        performance: 'excellent'
+                    },
+                    nav: {
+                        name: 'nav',
+                        description: 'Defines a section of navigation links, helping users and assistive technologies understand site structure.',
+                        attributes: {
+                            'aria-label': 'Describes the navigation\'s purpose',
+                            'aria-labelledby': 'References element that labels the navigation',
+                            'role': 'navigation (implicit)'
+                        },
+                        accessibility: [
+                            'Automatically has "navigation" landmark role',
+                            'Use aria-label to distinguish multiple nav elements',
+                            'Consider skip links for keyboard navigation'
+                        ],
+                        bestPractices: [
+                            'Reserve for major navigation blocks only',
+                            'Use aria-current="page" for current page links',
+                            'Implement proper keyboard navigation support'
+                        ],
+                        example: `<nav aria-label="Primary navigation">
+    <ul>
+        <li><a href="/" aria-current="page">Home</a></li>
+        <li><a href="/products">Products</a></li>
+        <li><a href="/services">Services</a></li>
+    </ul>
+</nav>
+
+<nav aria-label="Breadcrumb">
+    <ol>
+        <li><a href="/">Home</a></li>
+        <li><a href="/category">Category</a></li>
+        <li aria-current="page">Current Page</li>
+    </ol>
+</nav>`,
+                        performance: 'excellent'
+                    },
+                    main: {
+                        name: 'main',
+                        description: 'Represents the dominant content of the document body, excluding headers, footers, and navigation.',
+                        attributes: {
+                            'role': 'main (implicit)',
+                            'aria-label': 'Labels the main content area'
+                        },
+                        accessibility: [
+                            'Should be unique - only one main element per page',
+                            'Automatically receives "main" landmark role',
+                            'Skip links should target this element'
+                        ],
+                        bestPractices: [
+                            'Use exactly one main element per page',
+                            'Should not be descendant of article, aside, footer, header, or nav',
+                            'Focus management for single-page applications'
+                        ],
+                        example: `<main id="main-content" tabindex="-1">
+    <h1>Article Title</h1>
+    <article>
+        <h2>Section Heading</h2>
+        <p>Main content goes here...</p>
+    </article>
+    
+    <aside>
+        <h3>Related Articles</h3>
+        <ul>
+            <li><a href="/related-1">Related Article 1</a></li>
+            <li><a href="/related-2">Related Article 2</a></li>
+        </ul>
+    </aside>
+</main>`,
+                        performance: 'excellent'
+                    },
+                    article: {
+                        name: 'article',
+                        description: 'Represents a complete, independent piece of content that could be distributed or reused separately.',
+                        attributes: {
+                            'aria-labelledby': 'References the article\'s heading',
+                            'aria-describedby': 'References additional descriptive content'
+                        },
+                        accessibility: [
+                            'Screen readers announce article boundaries',
+                            'Should have a clear heading structure',
+                            'Consider aria-labelledby for better context'
+                        ],
+                        bestPractices: [
+                            'Each article should be self-contained',
+                            'Include proper heading hierarchy (h1-h6)',
+                            'Can be nested for comment systems or related content'
+                        ],
+                        example: `<article aria-labelledby="article-title">
+    <header>
+        <h2 id="article-title">Advanced CSS Grid Techniques</h2>
+        <p>Published on <time datetime="2024-03-15">March 15, 2024</time></p>
+        <p>By <address>Jane Developer</address></p>
+    </header>
+    
+    <p>CSS Grid has revolutionized web layout...</p>
+    
+    <section>
+        <h3>Grid Template Areas</h3>
+        <p>One of the most powerful features...</p>
+    </section>
+    
+    <footer>
+        <p>Tags: <span class="tag">CSS</span>, <span class="tag">Grid</span></p>
+    </footer>
+</article>`,
+                        performance: 'excellent'
+                    },
+                    section: {
+                        name: 'section',
+                        description: 'Represents a thematic grouping of content with a natural heading, used to structure document outline.',
+                        attributes: {
+                            'aria-labelledby': 'References the section\'s heading',
+                            'aria-label': 'Provides section label when heading is not visible'
+                        },
+                        accessibility: [
+                            'Should generally have a heading (h1-h6)',
+                            'Creates landmarks for navigation',
+                            'Use aria-label if no visible heading exists'
+                        ],
+                        bestPractices: [
+                            'Use when content has a natural heading',
+                            'Prefer article for standalone, distributable content',
+                            'Avoid using section just for styling purposes'
+                        ],
+                        example: `<section aria-labelledby="features-heading">
+    <h2 id="features-heading">Key Features</h2>
+    
+    <div class="feature-grid">
+        <div class="feature">
+            <h3>Performance</h3>
+            <p>Lightning-fast loading times...</p>
+        </div>
+        
+        <div class="feature">
+            <h3>Accessibility</h3>
+            <p>WCAG 2.1 AA compliant...</p>
+        </div>
+    </div>
+</section>
+
+<section aria-label="User testimonials">
+    <blockquote>
+        <p>"This product changed everything for our team."</p>
+        <footer>— Sarah Johnson, CTO</footer>
+    </blockquote>
+</section>`,
+                        performance: 'excellent'
+                    },
+                    aside: {
+                        name: 'aside',
+                        description: 'Contains content tangentially related to the main content, like sidebars, callouts, or supplementary information.',
+                        attributes: {
+                            'aria-label': 'Describes the aside\'s purpose',
+                            'role': 'complementary (implicit)'
+                        },
+                        accessibility: [
+                            'Automatically receives "complementary" landmark role',
+                            'Should be clearly distinguishable from main content',
+                            'Use descriptive aria-label for context'
+                        ],
+                        bestPractices: [
+                            'Content should be supplementary, not essential',
+                            'Can be removed without affecting main content flow',
+                            'Use for sidebars, pull quotes, or related links'
+                        ],
+                        example: `<main>
+    <article>
+        <h1>Climate Change Solutions</h1>
+        <p>The main article content...</p>
+        
+        <aside aria-label="Related statistics">
+            <h3>Did You Know?</h3>
+            <ul>
+                <li>CO2 levels have increased by 40% since 1990</li>
+                <li>Renewable energy grew by 260% in the last decade</li>
+            </ul>
+        </aside>
+    </article>
+</main>
+
+<aside aria-label="Sidebar navigation">
+    <h2>Related Topics</h2>
+    <nav>
+        <ul>
+            <li><a href="/renewable-energy">Renewable Energy</a></li>
+            <li><a href="/carbon-footprint">Carbon Footprint</a></li>
+        </ul>
+    </nav>
+</aside>`,
+                        performance: 'excellent'
+                    },
+                    footer: {
+                        name: 'footer',
+                        description: 'Contains footer information for its nearest ancestor sectioning content or sectioning root element.',
+                        attributes: {
+                            'role': 'contentinfo (when direct child of body)',
+                            'aria-label': 'Provides context for footer content'
+                        },
+                        accessibility: [
+                            'Main page footer gets "contentinfo" landmark role',
+                            'Should contain contact info, copyright, or related links',
+                            'Multiple footers allowed in different contexts'
+                        ],
+                        bestPractices: [
+                            'Include copyright and legal information',
+                            'Provide contact methods and social links',
+                            'Consider sitemap or important page links'
+                        ],
+                        example: `<footer role="contentinfo">
+    <div class="footer-content">
+        <section aria-labelledby="contact-heading">
+            <h3 id="contact-heading">Contact Us</h3>
+            <address>
+                <p>Email: <a href="mailto:info@company.com">info@company.com</a></p>
+                <p>Phone: <a href="tel:+1234567890">(123) 456-7890</a></p>
+            </address>
+        </section>
+        
+        <nav aria-label="Footer navigation">
+            <ul>
+                <li><a href="/privacy">Privacy Policy</a></li>
+                <li><a href="/terms">Terms of Service</a></li>
+                <li><a href="/accessibility">Accessibility</a></li>
+            </ul>
+        </nav>
+        
+        <p>&copy; 2024 Company Name. All rights reserved.</p>
+    </div>
+</footer>`,
+                        performance: 'excellent'
+                    },
+                    figure: {
+                        name: 'figure',
+                        description: 'Represents self-contained content with an optional caption, typically images, diagrams, or code listings.',
+                        attributes: {
+                            'aria-labelledby': 'References the figcaption element',
+                            'aria-describedby': 'Additional descriptive content',
+                            'role': 'figure (implicit)'
+                        },
+                        accessibility: [
+                            'Should include figcaption for context',
+                            'Screen readers announce figure boundaries',
+                            'Use alt text on images within figures'
+                        ],
+                        bestPractices: [
+                            'Always pair with descriptive figcaption',
+                            'Content should be referenceable from main text',
+                            'Can contain multiple related elements'
+                        ],
+                        example: `<figure aria-labelledby="chart-caption">
+    <img src="/sales-chart.png" alt="Bar chart showing quarterly sales data">
+    <figcaption id="chart-caption">
+        Figure 1: Quarterly sales performance showing 23% growth in Q4
+    </figcaption>
+</figure>
+
+<figure>
+    <pre><code>
+function semanticHTML() {
+    return 'Better accessibility and SEO!';
+}
+    </code></pre>
+    <figcaption>
+        Code example demonstrating semantic HTML benefits
+    </figcaption>
+</figure>`,
+                        performance: 'excellent'  
+                    },
+                    time: {
+                        name: 'time',
+                        description: 'Represents a specific period in time, with machine-readable datetime attribute for better data processing.',
+                        attributes: {
+                            'datetime': 'Machine-readable date/time value',
+                            'title': 'Additional context for the time element'
+                        },
+                        accessibility: [
+                            'Provides semantic meaning for dates and times',
+                            'Assists with calendar integration',
+                            'Improves content parsing for assistive technologies'
+                        ],
+                        bestPractices: [
+                            'Always include datetime attribute for precision',
+                            'Use standard ISO 8601 format in datetime',
+                            'Human-readable content can differ from datetime value'
+                        ],
+                        example: `<article>
+    <header>
+        <h2>Breaking News Update</h2>
+        <p>Published <time datetime="2024-03-15T14:30:00Z" title="March 15, 2024 at 2:30 PM UTC">
+            today at 2:30 PM
+        </time></p>
+    </header>
+    
+    <p>Event scheduled for <time datetime="2024-04-01">April 1st</time></p>
+    
+    <p>Duration: <time datetime="PT2H30M">2 hours 30 minutes</time></p>
+</article>`,
+                        performance: 'good'
+                    },
+                    address: {
+                        name: 'address',
+                        description: 'Provides contact information for a person, people, or organization, contextually related to the current content.',
+                        attributes: {
+                            'aria-label': 'Clarifies what the address represents'
+                        },
+                        accessibility: [
+                            'Clearly identifies contact information',
+                            'Should not be used for postal addresses unless they are contact addresses',
+                            'Helps users locate relevant contact methods'
+                        ],
+                        bestPractices: [
+                            'Use for author contact info, not general postal addresses',
+                            'Include multiple contact methods when available',
+                            'Consider microdata or structured data markup'
+                        ],
+                        example: `<article>
+    <h2>Technical Article</h2>
+    <p>Article content goes here...</p>
+    
+    <footer>
+        <address>
+            Written by <a href="mailto:author@example.com">Jane Smith</a><br>
+            Senior Developer at <a href="https://company.com">Tech Corp</a><br>
+            Follow on <a href="https://twitter.com/janesmith">Twitter</a>
+        </address>
+    </footer>
+</article>
+
+<footer>
+    <address aria-label="Company contact information">
+        <strong>Tech Solutions Inc.</strong><br>
+        <a href="mailto:contact@techsolutions.com">contact@techsolutions.com</a><br>
+        <a href="tel:+15551234567">(555) 123-4567</a>
+    </address>
+</footer>`,
+                        performance: 'good'
+                    }
+                };
+
+                this.init();
+            }
+
+            init() {
+                this.renderTagList();
+                this.bindEvents();
+                this.displayTag(this.currentTag);
+                this.createTooltips();
+            }
+
+            renderTagList() {
+                const tagList = document.getElementById('tagList');
+                tagList.innerHTML = '';
+
+                Object.keys(this.semanticTags).forEach(tagName => {
+                    const li = document.createElement('li');
+                    li.className = `tag-item ${tagName === this.currentTag ? 'active' : ''}`;
+                    
+                    const button = document.createElement('button');
+                    button.className = 'tag-button';
+                    button.textContent = `<${tagName}>`;
+                    button.dataset.tag = tagName;
+                    
+                    li.appendChild(button);
+                    tagList.appendChild(li);
+                });
+            }
+
+            bindEvents() {
+                // Tag selection
+                document.getElementById('tagList').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('tag-button')) {
+                        const tagName = e.target.dataset.tag;
+                        this.selectTag(tagName);
+                    }
+                });
+
+                // Animation toggle
+                document.getElementById('animationToggle').addEventListener('click', () => {
+                    this.toggleAnimations();
+                });
+
+                // Accessibility mode
+                document.getElementById('accessibilityMode').addEventListener('click', () => {
+                    this.toggleAccessibilityMode();
+                });
+
+                // Animation speed
+                const speedSlider = document.getElementById('animationSpeed');
+                speedSlider.addEventListener('input', (e) => {
+                    this.animationSpeed = parseFloat(e.target.value);
+                    document.getElementById('speedValue').textContent = `${this.animationSpeed}x`;
+                    this.updateAnimationSpeed();
+                });
+
+                // Copy code functionality
+                document.getElementById('copyButton').addEventListener('click', () => {
+                    this.copyCode();
+                });
+
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    this.handleKeyboardNavigation(e);
+                });
+            }
+
+            selectTag(tagName) {
+                if (this.currentTag === tagName) return;
+                
+                this.currentTag = tagName;
+                this.updateActiveTag();
+                this.displayTag(tagName);
+            }
+
+            updateActiveTag() {
+                document.querySelectorAll('.tag-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                const activeItem = document.querySelector(`[data-tag="${this.currentTag}"]`).closest('.tag-item');
+                activeItem.classList.add('active');
+            }
+
+            displayTag(tagName) {
+                const tag = this.semanticTags[tagName];
+                if (!tag) return;
+
+                this.renderVisualDemo(tag);
+                this.renderCodeView(tag);
+                this.updatePerformanceIndicator(tag.performance);
+            }
+
+            renderVisualDemo(tag) {
+                const visualDemo = document.getElementById('visualDemo');
+                
+                // Show loading state briefly for smooth transition
+                visualDemo.innerHTML = `
+                    <div class="loading-skeleton"></div>
+                    <div class="loading-skeleton" style="width: 70%;"></div>
+                    <div class="loading-skeleton" style="width: 90%;"></div>
+                `;
+
+                setTimeout(() => {
+                    visualDemo.innerHTML = `
+                        <div class="tag-info demo-element">
+                            <h3>&lt;${tag.name}&gt;</h3>
+                            <p>${tag.description}</p>
+                            
+                            <div class="tag-attributes">
+                                <h4>Common Attributes:</h4>
+                                <div class="attribute-list">
+                                    ${Object.entries(tag.attributes).map(([attr, desc]) => `
+                                        <div class="attribute-item">
+                                            <span class="attribute-name">${attr}</span>
+                                            <span class="attribute-description">${desc}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <div class="accessibility-info">
+                                <h4>♿ Accessibility Benefits</h4>
+                                <ul>
+                                    ${tag.accessibility.map(item => `<li>${item}</li>`).join('')}
+                                </ul>
+                            </div>
+
+                            <div class="best-practices">
+                                <h4>💡 Best Practices</h4>
+                                <ul>
+                                    ${tag.bestPractices.map(item => `<li>${item}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }, this.animationsEnabled ? 300 / this.animationSpeed : 0);
+            }
+
+            renderCodeView(tag) {
+                const codeEditor = document.getElementById('codeEditor');
+                
+                // Apply syntax highlighting
+                const highlightedCode = this.applySyntaxHighlighting(tag.example);
+                
+                if (this.animationsEnabled) {
+                    codeEditor.style.opacity = '0';
+                    setTimeout(() => {
+                        codeEditor.innerHTML = highlightedCode;
+                        codeEditor.style.transition = `opacity ${0.3 / this.animationSpeed}s ease`;
+                        codeEditor.style.opacity = '1';
+                    }, 150 / this.animationSpeed);
+                } else {
+                    codeEditor.innerHTML = highlightedCode;
+                }
+            }
+
+            applySyntaxHighlighting(code) {
+                return code
+                    .replace(/(&lt;\/?)(\w+)([^&]*&gt;)/g, '<span class="tag">$1$2</span><span class="attribute">$3</span>')
+                    .replace(/(\w+)=/g, '<span class="attribute">$1</span>=')
+                    .replace(/="([^"]*)"/g, '=<span class="value">"$1"</span>')
+                    .replace(/^(\s*)([^<>\n]+)$/gm, '$1<span class="content">$2</span>');
+            }
+
+            updatePerformanceIndicator(performance) {
+                const indicator = document.getElementById('performanceIndicator');
+                indicator.className = `performance-indicator ${performance}`;
+                
+                const icons = {
+                    excellent: '⚡',
+                    good: '✓',
+                    fair: '⚠️'
+                };
+                
+                const labels = {
+                    excellent: 'Excellent',
+                    good: 'Good',
+                    fair: 'Fair'
+                };
+                
+                indicator.innerHTML = `${icons[performance]} ${labels[performance]}`;
+            }
+
+            toggleAnimations() {
+                this.animationsEnabled = !this.animationsEnabled;
+                const button = document.getElementById('animationToggle');
+                button.classList.toggle('active', this.animationsEnabled);
+                
+                // Update CSS custom property for animation duration
+                document.documentElement.style.setProperty('--animation-enabled', this.animationsEnabled ? '1' : '0');
+            }
+
+            toggleAccessibilityMode() {
+                this.accessibilityMode = !this.accessibilityMode;
+                const button = document.getElementById('accessibilityMode');
+                button.classList.toggle('active', this.accessibilityMode);
+                
+                // Apply accessibility enhancements
+                if (this.accessibilityMode) {
+                    document.body.classList.add('high-contrast');
+                    // Increase font sizes, improve contrast, reduce animations
+                    document.documentElement.style.setProperty('--text-size-multiplier', '1.2');
+                } else {
+                    document.body.classList.remove('high-contrast');
+                    document.documentElement.style.setProperty('--text-size-multiplier', '1');
+                }
+            }
+
+            updateAnimationSpeed() {
+                document.documentElement.style.setProperty('--animation-speed', this.animationSpeed);
+            }
+
+            copyCode() {
+                const codeContent = document.getElementById('codeEditor').textContent;
+                
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(codeContent).then(() => {
+                        this.showStatusMessage('Code copied to clipboard!');
+                    });
+                } else {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = codeContent;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    this.showStatusMessage('Code copied to clipboard!');
+                }
+            }
+
+            showStatusMessage(message) {
+                const indicator = document.getElementById('statusIndicator');
+                indicator.textContent = message;
+                indicator.classList.add('show');
+                
+                setTimeout(() => {
+                    indicator.classList.remove('show');
+                }, 3000);
+            }
+
+            handleKeyboardNavigation(e) {
+                const tagNames = Object.keys(this.semanticTags);
+                const currentIndex = tagNames.indexOf(this.currentTag);
+                
+                switch(e.key) {
+                    case 'ArrowUp':
+                        if (e.target.closest('.sidebar')) {
+                            e.preventDefault();
+                            const prevIndex = currentIndex > 0 ? currentIndex - 1 : tagNames.length - 1;
+                            this.selectTag(tagNames[prevIndex]);
+                        }
+                        break;
+                    case 'ArrowDown':
+                        if (e.target.closest('.sidebar')) {
+                            e.preventDefault();
+                            const nextIndex = currentIndex < tagNames.length - 1 ? currentIndex + 1 : 0;
+                            this.selectTag(tagNames[nextIndex]);
+                        }
+                        break;
+                    case 'c':
+                        if (e.ctrlKey || e.metaKey) {
+                            e.preventDefault();
+                            this.copyCode();
+                        }
+                        break;
+                    case 'a':
+                        if (e.ctrlKey || e.metaKey) {
+                            // Let default behavior happen, but also toggle animations
+                            setTimeout(() => this.toggleAnimations(), 0);
+                        }
+                        break;
+                }
+            }
+
+            createTooltips() {
+                const tooltip = document.getElementById('tooltip');
+                const elementsWithTooltips = document.querySelectorAll('[title], .performance-indicator, .tag-button');
+                
+                elementsWithTooltips.forEach(element => {
+                    element.addEventListener('mouseenter', (e) => {
+                        const text = e.target.title || e.target.textContent || 'Additional information';
+                        tooltip.textContent = text;
+                        tooltip.classList.add('visible');
+                        
+                        // Position tooltip
+                        const rect = e.target.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left + window.scrollX}px`;
+                        tooltip.style.top = `${rect.bottom + window.scrollY + 5}px`;
+                    });
+                    
+                    element.addEventListener('mouseleave', () => {
+                        tooltip.classList.remove('visible');
+                    });
+                });
+            }
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new SemanticTagExplorer();
+        });
+
+        // Add smooth scroll behavior for better UX
+        document.documentElement.style.scrollBehavior = 'smooth';
+
+        // Performance monitoring
+        if (window.performance && window.performance.mark) {
+            window.performance.mark('semantic-explorer-initialized');
+        }
+
+        // Add focus management for better accessibility
+        document.addEventListener('focusin', (e) => {
+            if (e.target.matches('.tag-button')) {
+                e.target.closest('.tag-item').style.outline = '2px solid var(--accent-green)';
+            }
+        });
+
+        document.addEventListener('focusout', (e) => {
+            if (e.target.matches('.tag-button')) {
+                e.target.closest('.tag-item').style.outline = 'none';
+            }
+        });
+
+        // Add service worker registration for progressive web app features
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                console.log('Semantic Tag Explorer: Ready for PWA enhancement');
+            });
+        }
+
+        // Error boundary for graceful error handling
+        window.addEventListener('error', (e) => {
+            console.error('Semantic Tag Explorer Error:', e.error);
+            // Could implement user-friendly error messages here
+        });
+
+        // Add resize handler for responsive behavior
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // Recalculate layouts or update responsive elements
+                const tooltip = document.getElementById('tooltip');
+                tooltip.classList.remove('visible');
+            }, 250);
+        });
+    </script>
+</body>
+</html>
