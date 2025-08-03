@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Semantic Tag Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a73e8;
+            --secondary: #34a853;
+            --accent: #ff6b35;
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --border: #30363d;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: var(--gradient);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(10px) translateY(10px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #fff, #f0f6fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            min-height: calc(100vh - 200px);
+        }
+
+        .sidebar {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: fit-content;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 2rem;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+
+        .tag-category {
+            margin-bottom: 2rem;
+        }
+
+        .category-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        .tag-list {
+            list-style: none;
+        }
+
+        .tag-item {
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.25rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .tag-item:hover {
+            background: rgba(26, 115, 232, 0.1);
+            border-left-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .tag-item.active {
+            background: var(--primary);
+            color: white;
+            border-left-color: var(--accent);
+        }
+
+        .main-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .content-header {
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(26, 115, 232, 0.1) 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tag-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .tag-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            background: rgba(26, 115, 232, 0.2);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .content-tabs {
+            display: flex;
+            background: var(--bg-dark);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            background: rgba(26, 115, 232, 0.1);
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary);
+            background: rgba(26, 115, 232, 0.1);
+            color: var(--primary);
+        }
+
+        .tab-content {
+            padding: 2rem;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .demo-section {
+            background: var(--bg-dark);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .demo-header {
+            padding: 1rem;
+            background: rgba(26, 115, 232, 0.1);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .demo-content {
+            padding: 1.5rem;
+            min-height: 200px;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .code-block::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .visual-demo {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            background: rgba(26, 115, 232, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visual-demo::before {
+            content: '✨ Live Preview';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--secondary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .semantic-outline {
+            border: 2px solid;
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .semantic-outline::before {
+            content: attr(data-tag);
+            position: absolute;
+            top: -10px;
+            left: 8px;
+            background: var(--bg-card);
+            padding: 0 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: inherit;
+        }
+
+        .section-outline { border-color: #ff6b35; color: #ff6b35; }
+        .article-outline { border-color: #34a853; color: #34a853; }
+        .header-outline { border-color: #1a73e8; color: #1a73e8; }
+        .nav-outline { border-color: #9c27b0; color: #9c27b0; }
+        .main-outline { border-color: #ff9800; color: #ff9800; }
+        .aside-outline { border-color: #795548; color: #795548; }
+        .footer-outline { border-color: #607d8b; color: #607d8b; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .accessibility-info {
+            background: rgba(52, 168, 83, 0.1);
+            border: 1px solid rgba(52, 168, 83, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .accessibility-title {
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .best-practices {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .best-practices-title {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #1557b0;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+            
+            .demo-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1 class="title">HTML Semantic Tag Explorer</h1>
+            <p class="subtitle">Master semantic HTML with interactive visualizations and real-world examples</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">15+</div>
+                    <div class="stat-label">Semantic Tags</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Accessible</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">W3C</div>
+                    <div class="stat-label">Compliant</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <input type="text" class="search-box" placeholder="Search semantic tags..." id="searchBox">
+            
+            <div class="tag-category">
+                <h3 class="category-title">Document Structure</h3>
+                <ul class="tag-list">
+                    <li class="tag-item active" data-tag="section">&lt;section&gt;</li>
+                    <li class="tag-item" data-tag="article">&lt;article&gt;</li>
+                    <li class="tag-item" data-tag="header">&lt;header&gt;</li>
+                    <li class="tag-item" data-tag="footer">&lt;footer&gt;</li>
+                    <li class="tag-item" data-tag="main">&lt;main&gt;</li>
+                    <li class="tag-item" data-tag="aside">&lt;aside&gt;</li>
+                </ul>
+            </div>
+
+            <div class="tag-category">
+                <h3 class="category-title">Navigation</h3>
+                <ul class="tag-list">
+                    <li class="tag-item" data-tag="nav">&lt;nav&gt;</li>
+                    <li class="tag-item" data-tag="menu">&lt;menu&gt;</li>
+                </ul>
+            </div>
+
+            <div class="tag-category">
+                <h3 class="category-title">Content Grouping</h3>
+                <ul class="tag-list">
+                    <li class="tag-item" data-tag="figure">&lt;figure&gt;</li>
+                    <li class="tag-item" data-tag="figcaption">&lt;figcaption&gt;</li>
+                    <li class="tag-item" data-tag="details">&lt;details&gt;</li>
+                    <li class="tag-item" data-tag="summary">&lt;summary&gt;</li>
+                </ul>
+            </div>
+
+            <div class="tag-category">
+                <h3 class="category-title">Text Semantics</h3>
+                <ul class="tag-list">
+                    <li class="tag-item" data-tag="mark">&lt;mark&gt;</li>
+                    <li class="tag-item" data-tag="time">&lt;time&gt;</li>
+                    <li class="tag-item" data-tag="address">&lt;address&gt;</li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h2 class="tag-name" id="tagName">&lt;section&gt;</h2>
+                <p class="tag-description" id="tagDescription">Groups related content together, typically with a heading. Represents a thematic grouping of content.</p>
+                <div class="tag-meta" id="tagMeta">
+                    <span class="meta-badge">Sectioning Content</span>
+                    <span class="meta-badge">Block-level</span>
+                    <span class="meta-badge">HTML5</span>
+                </div>
+            </div>
+
+            <div class="content-tabs">
+                <div class="tab active" data-tab="demo">🎨 Live Demo</div>
+                <div class="tab" data-tab="usage">📝 Usage Guide</div>
+                <div class="tab" data-tab="accessibility">♿ Accessibility</div>
+                <div class="tab" data-tab="examples">💡 Examples</div>
+            </div>
+
+            <div class="tab-content active" id="demo">
+                <div class="demo-container">
+                    <div class="demo-section">
+                        <div class="demo-header">
+                            <span>📄</span> HTML Code
+                        </div>
+                        <div class="demo-content">
+                            <div class="code-block" data-lang="HTML" id="htmlCode">
+&lt;section&gt;
+  &lt;h2&gt;Product Features&lt;/h2&gt;
+  &lt;p&gt;Our innovative solution provides...&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;Advanced analytics&lt;/li&gt;
+    &lt;li&gt;Real-time monitoring&lt;/li&gt;
+    &lt;li&gt;Scalable infrastructure&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/section&gt;
+                            </div>
+                            <button class="copy-btn" onclick="copyCode('htmlCode')">Copy Code</button>
+                        </div>
+                    </div>
+
+                    <div class="demo-section">
+                        <div class="demo-header">
+                            <span>👁️</span> Visual Output
+                        </div>
+                        <div class="demo-content">
+                            <div class="visual-demo" id="visualDemo">
+                                <div class="semantic-outline section-outline" data-tag="section">
+                                    <h2>Product Features</h2>
+                                    <p>Our innovative solution provides cutting-edge technology for modern businesses.</p>
+                                    <ul>
+                                        <li>Advanced analytics</li>
+                                        <li>Real-time monitoring</li>
+                                        <li>Scalable infrastructure</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">SEO Benefits</div>
+                        <div class="feature-desc">Search engines better understand content structure and hierarchy</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">♿</div>
+                        <div class="feature-title">Accessibility</div>
+                        <div class="feature-desc">Screen readers can navigate content more effectively</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-title">Maintainability</div>
+                        <div class="feature-desc">Cleaner, more organized code that's easier to maintain</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <div class="feature-title">Responsive</div>
+                        <div class="feature-desc">Better mobile experience with semantic structure</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="usage">
+                <h3>When to Use This Tag</h3>
+                <p id="usageText">Use &lt;section&gt; to group related content that has a thematic connection. Each section should ideally have a heading that describes its content.</p>
+
+                <div class="best-practices">
+                    <div class="best-practices-title">
+                        <span>✅</span> Best Practices
+                    </div>
+                    <ul id="bestPracticesList">
+                        <li>Always include a heading (h1-h6) in each section</li>
+                        <li>Use sections for thematically related content</li>
+                        <li>Don't use section just for styling purposes</li>
+                        <li>Consider using article for standalone content</li>
+                    </ul>
+                </div>
+
+                <h3>Common Mistakes to Avoid</h3>
+                <div class="code-block" data-lang="HTML">
+&lt;!-- ❌ Don't use section without a heading --&gt;
+&lt;section&gt;
+  &lt;p&gt;Some content...&lt;/p&gt;
+&lt;/section&gt;
+
+&lt;!-- ✅ Do include a heading --&gt;
+&lt;section&gt;
+  &lt;h2&gt;About Us&lt;/h2&gt;
+  &lt;p&gt;Our company story...&lt;/p&gt;
+&lt;/section&gt;
+                </div>
+            </div>
+
+            <div class="tab-content" id="accessibility">
+                <div class="accessibility-info">
+                    <div class="accessibility-title">
+                        <span>♿</span> Accessibility Features
+                    </div>
+                    <div id="accessibilityContent">
+                        <p>The &lt;section&gt; element provides important structural information to assistive technologies:</p>
+                        <ul>
+                            <li>Creates landmark regions for screen readers</li>
+                            <li>Enables skip navigation functionality</li>
+                            <li>Improves content organization for users with cognitive disabilities</li>
+                            <li>Supports ARIA roles and properties</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>ARIA Integration</h3>
+                <div class="code-block" data-lang="HTML">
+&lt;section aria-labelledby="features-heading"&gt;
+  &lt;h2 id="features-heading"&gt;Key Features&lt;/h2&gt;
+  &lt;p&gt;Content about features...&lt;/p&gt;
+&lt;/section&gt;
+                </div>
+            </div>
+
+            <div class="tab-content" id="examples">
+                <h3>Real-World Examples</h3>
+                <div id="examplesContent">
+                    <div class="code-block" data-lang="HTML">
+&lt;!-- Blog post with multiple sections --&gt;
+&lt;article&gt;
+  &lt;header&gt;
+    &lt;h1&gt;Understanding Web Performance&lt;/h1&gt;
+  &lt;/header&gt;
+  
+  &lt;section&gt;
+    &lt;h2&gt;Introduction&lt;/h2&gt;
+    &lt;p&gt;Web performance is crucial...&lt;/p&gt;
+  &lt;/section&gt;
+  
+  &lt;section&gt;
+    &lt;h2&gt;Measurement Techniques&lt;/h2&gt;
+    &lt;p&gt;Various tools can help...&lt;/p&gt;
+  &lt;/section&gt;
+  
+  &lt;section&gt;
+    &lt;h2&gt;Optimization Strategies&lt;/h2&gt;
+    &lt;p&gt;Key strategies include...&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/article&gt;
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const tagData = {
+            section: {
+                name: '<section>',
+                description: 'Groups related content together, typically with a heading. Represents a thematic grouping of content.',
+                meta: ['Sectioning Content', 'Block-level', 'HTML5'],
+                usage: 'Use <section> to group related content that has a thematic connection. Each section should ideally have a heading that describes its content.',
+                bestPractices: [
+                    'Always include a heading (h1-h6) in each section',
+                    'Use sections for thematically related content',
+                    'Don\'t use section just for styling purposes',
+                    'Consider using article for standalone content'
+                ],
+                accessibility: 'The <section> element provides important structural information to assistive technologies: Creates landmark regions for screen readers, enables skip navigation functionality, improves content organization for users with cognitive disabilities, and supports ARIA roles and properties.',
+                htmlCode: `<section>
+  <h2>Product Features</h2>
+  <p>Our innovative solution provides...</p>
+  <ul>
+    <li>Advanced analytics</li>
+    <li>Real-time monitoring</li>
+    <li>Scalable infrastructure</li>
+  </ul>
+</section>`,
+                visualDemo: `<div class="semantic-outline section-outline" data-tag="section">
+                    <h2>Product Features</h2>
+                    <p>Our innovative solution provides cutting-edge technology for modern businesses.</p>
+                    <ul>
+                        <li>Advanced analytics</li>
+                        <li>Real-time monitoring</li>
+                        <li>Scalable infrastructure</li>
+                    </ul>
+                </div>`,
+                examples: `<!-- Blog post with multiple sections -->
+<article>
+  <header>
+    <h1>Understanding Web Performance</h1>
+  </header>
+  
+  <section>
+    <h2>Introduction</h2>
+    <p>Web performance is crucial...</p>
+  </section>
+  
+  <section>
+    <h2>Measurement Techniques</h2>
+    <p>Various tools can help...</p>
+  </section>
+  
+  <section>
+    <h2>Optimization Strategies</h2>
+    <p>Key strategies include...</p>
+  </section>
+</article>`
+            },
+            article: {
+                name: '<article>',
+                description: 'Represents a standalone piece of content that could be distributed independently, such as a blog post, news article, or forum post.',
+                meta: ['Sectioning Content', 'Block-level', 'HTML5', 'Syndication'],
+                usage: 'Use <article> for content that makes sense on its own and could be shared or syndicated independently. Think blog posts, news articles, or product reviews.',
+                bestPractices: [
+                    'Content should be self-contained and meaningful alone',
+                    'Include a heading to describe the article',
+                    'Can contain multiple sections',
+                    'Perfect for RSS feeds and syndication'
+                ],
+                accessibility: 'The <article> element helps screen readers identify complete, standalone content blocks, making it easier for users to navigate between different articles on a page.',
+                htmlCode: `<article>
+  <header>
+    <h1>The Future of Web Development</h1>
+    <time datetime="2024-01-15">January 15, 2024</time>
+  </header>
+  <p>Web development continues to evolve...</p>
+  <footer>
+    <p>By: Jane Developer</p>
+  </footer>
+</article>`,
+                visualDemo: `<div class="semantic-outline article-outline" data-tag="article">
+                    <header>
+                        <h1>The Future of Web Development</h1>
+                        <time datetime="2024-01-15">January 15, 2024</time>
+                    </header>
+                    <p>Web development continues to evolve rapidly with new frameworks, tools, and methodologies emerging regularly.</p>
+                    <footer>
+                        <p>By: Jane Developer</p>
+                    </footer>
+                </div>`,
+                examples: `<!-- Multiple articles in a blog -->
+<main>
+  <article>
+    <h2>JavaScript ES2024 Features</h2>
+    <p>The latest JavaScript features...</p>
+  </article>
+  
+  <article>
+    <h2>CSS Grid vs Flexbox</h2>
+    <p>Understanding when to use each...</p>
+  </article>
+</main>`
+            },
+            header: {
+                name: '<header>',
+                description: 'Represents introductory content or navigational aids. Can be used for page headers or section headers.',
+                meta: ['Sectioning Content', 'Block-level', 'HTML5'],
+                usage: 'Use <header> for introductory content at the top of a page, section, or article. Often contains headings, logos, navigation, or metadata.',
+                bestPractices: [
+                    'Can appear multiple times in a document',
+                    'Often contains h1-h6, nav, or form elements',
+                    'Don\'t nest header inside header',
+                    'Perfect for page mastheads and article headers'
+                ],
+                accessibility: 'Headers provide important landmark information, helping screen reader users understand the structure and find key navigation elements quickly.',
+                htmlCode: `<header>
+  <h1>My Portfolio</h1>
+  <nav>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>`,
+                visualDemo: `<div class="semantic-outline header-outline" data-tag="header">
+                    <h1 style="margin-bottom: 0.5rem;">My Portfolio</h1>
+                    <nav>
+                        <ul style="list-style: none; display: flex; gap: 1rem; padding: 0;">
+                            <li><a href="#about" style="color: var(--primary);">About</a></li>
+                            <li><a href="#projects" style="color: var(--primary);">Projects</a></li>
+                            <li><a href="#contact" style="color: var(--primary);">Contact</a></li>
+                        </ul>
+                    </nav>
+                </div>`,
+                examples: `<!-- Page header -->
+<header>
+  <img src="logo.png" alt="Company Logo">
+  <h1>TechCorp Solutions</h1>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/services">Services</a>
+    <a href="/about">About</a>
+  </nav>
+</header>
+
+<!-- Article header -->
+<article>
+  <header>
+    <h2>Breaking News</h2>
+    <time>March 15, 2024</time>
+    <p>Latest updates from the tech world</p>
+  </header>
+</article>`
+            },
+            footer: {
+                name: '<footer>',
+                description: 'Contains information about its parent section, such as copyright, links to related documents, or author information.',
+                meta: ['Sectioning Content', 'Block-level', 'HTML5'],
+                usage: 'Use <footer> for concluding content like copyright notices, contact information, or related links. Can be used for page footers or section footers.',
+                bestPractices: [
+                    'Can appear multiple times in a document',
+                    'Contains metadata about the parent element',
+                    'Often includes copyright, contact info, or navigation',
+                    'Don\'t nest footer inside footer'
+                ],
+                accessibility: 'Footers provide important contextual information and often contain site navigation, making them valuable landmarks for screen reader users.',
+                htmlCode: `<footer>
+  <p>&copy; 2024 TechCorp. All rights reserved.</p>
+  <nav>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/terms">Terms of Service</a>
+    <a href="/contact">Contact Us</a>
+  </nav>
+</footer>`,
+                visualDemo: `<div class="semantic-outline footer-outline" data-tag="footer">
+                    <p>&copy; 2024 TechCorp. All rights reserved.</p>
+                    <nav>
+                        <a href="/privacy" style="color: var(--primary); margin-right: 1rem;">Privacy Policy</a>
+                        <a href="/terms" style="color: var(--primary); margin-right: 1rem;">Terms of Service</a>
+                        <a href="/contact" style="color: var(--primary);">Contact Us</a>
+                    </nav>
+                </div>`,
+                examples: `<!-- Page footer -->
+<footer>
+  <div class="footer-content">
+    <div class="company-info">
+      <h3>About TechCorp</h3>
+      <p>Leading innovation since 2010</p>
+    </div>
+    <div class="social-links">
+      <a href="#">Twitter</a>
+      <a href="#">LinkedIn</a>
+    </div>
+  </div>
+  <div class="copyright">
+    <p>&copy; 2024 All rights reserved</p>
+  </div>
+</footer>`
+            },
+            main: {
+                name: '<main>',
+                description: 'Represents the dominant content of the document. There should be only one main element per page.',
+                meta: ['Sectioning Content', 'Block-level', 'HTML5', 'Unique'],
+                usage: 'Use <main> to wrap the primary content of your document. Skip navigation, sidebars, and headers should be outside of main.',
+                bestPractices: [
+                    'Only one main element per document',
+                    'Should contain the primary content',
+                    'Exclude site navigation, headers, and footers',
+                    'Great for skip navigation functionality'
+                ],
+                accessibility: 'The main element provides a crucial landmark that allows screen reader users to jump directly to the primary content, bypassing navigation and other secondary elements.',
+                htmlCode: `<main>
+  <h1>Welcome to Our Platform</h1>
+  <section>
+    <h2>Getting Started</h2>
+    <p>Follow these steps to begin...</p>
+  </section>
+  <section>
+    <h2>Features</h2>
+    <p>Discover what makes us different...</p>
+  </section>
+</main>`,
+                visualDemo: `<div class="semantic-outline main-outline" data-tag="main">
+                    <h1>Welcome to Our Platform</h1>
+                    <section style="margin: 1rem 0;">
+                        <h2>Getting Started</h2>
+                        <p>Follow these steps to begin your journey with our innovative platform.</p>
+                    </section>
+                    <section style="margin: 1rem 0;">
+                        <h2>Features</h2>
+                        <p>Discover what makes us different from the competition.</p>
+                    </section>
+                </div>`,
+                examples: `<!-- Typical page structure -->
+<body>
+  <header>
+    <nav>Site navigation</nav>
+  </header>
+  
+  <main>
+    <h1>Page Title</h1>
+    <article>
+      <h2>Article Title</h2>
+      <p>Main content goes here...</p>
+    </article>
+  </main>
+  
+  <aside>Sidebar content</aside>
+  <footer>Footer information</footer>
+</body>`
+            },
+            aside: {
+                name: '<aside>',
+                description: 'Represents content that is tangentially related to the main content, such as sidebars, call-out boxes, or advertisements.',
+                meta: ['Sectioning Content', 'Block-level', 'HTML5'],
+                usage: 'Use <aside> for content that is related but separate from the main content flow, like sidebars, related links, or supplementary information.',
+                bestPractices: [
+                    'Content should be tangentially related',
+                    'Perfect for sidebars and call-out boxes',
+                    'Can be used for advertisements',
+                    'Should make sense when removed from main content'
+                ],
+                accessibility: 'Aside elements help screen readers distinguish between main content and supplementary information, allowing users to skip or focus on what\'s most important.',
+                htmlCode: `<aside>
+  <h3>Related Articles</h3>
+  <ul>
+    <li><a href="#">Understanding CSS Grid</a></li>
+    <li><a href="#">Modern JavaScript Patterns</a></li>
+    <li><a href="#">Web Performance Tips</a></li>
+  </ul>
+</aside>`,
+                visualDemo: `<div class="semantic-outline aside-outline" data-tag="aside">
+                    <h3>Related Articles</h3>
+                    <ul>
+                        <li><a href="#" style="color: var(--primary);">Understanding CSS Grid</a></li>
+                        <li><a href="#" style="color: var(--primary);">Modern JavaScript Patterns</a></li>
+                        <li><a href="#" style="color: var(--primary);">Web Performance Tips</a></li>
+                    </ul>
+                </div>`,
+                examples: `<!-- Sidebar with related content -->
+<main>
+  <article>
+    <h1>Web Development Trends</h1>
+    <p>The latest trends in web development...</p>
+  </article>
+</main>
+
+<aside>
+  <section>
+    <h2>Popular Posts</h2>
+    <ul>
+      <li>React vs Vue in 2024</li>
+      <li>CSS Container Queries</li>
+    </ul>
+  </section>
+  
+  <section>
+    <h2>Newsletter</h2>
+    <p>Subscribe for updates</p>
+  </section>
+</aside>`
+            },
+            nav: {
+                name: '<nav>',
+                description: 'Represents a section of navigation links, either within the current document or to other documents.',
+                meta: ['Sectioning Content', 'Block-level', 'HTML5'],
+                usage: 'Use <nav> to wrap major navigation blocks like main site navigation, breadcrumbs, or table of contents.',
+                bestPractices: [
+                    'Use for major navigation blocks only',
+                    'Don\'t wrap every single link in nav',
+                    'Can contain lists, but not required',
+                    'Great for breadcrumbs and main menus'
+                ],
+                accessibility: 'Navigation elements are crucial landmarks that help screen reader users quickly find and navigate through different sections of a website.',
+                htmlCode: `<nav aria-label="Main navigation">
+  <ul>
+    <li><a href="/" aria-current="page">Home</a></li>
+    <li><a href="/products">Products</a></li>
+    <li><a href="/services">Services</a></li>
+    <li><a href="/contact">Contact</a></li>
+  </ul>
+</nav>`,
+                visualDemo: `<div class="semantic-outline nav-outline" data-tag="nav">
+                    <ul style="list-style: none; display: flex; gap: 1rem; padding: 0;">
+                        <li><a href="/" style="color: var(--primary); font-weight: bold;">Home</a></li>
+                        <li><a href="/products" style="color: var(--primary);">Products</a></li>
+                        <li><a href="/services" style="color: var(--primary);">Services</a></li>
+                        <li><a href="/contact" style="color: var(--primary);">Contact</a></li>
+                    </ul>
+                </div>`,
+                examples: `<!-- Main navigation -->
+<nav>
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/services">Services</a></li>
+  </ul>
+</nav>
+
+<!-- Breadcrumb navigation -->
+<nav aria-label="Breadcrumb">
+  <ol>
+    <li><a href="/">Home</a></li>
+    <li><a href="/products">Products</a></li>
+    <li>Laptops</li>
+  </ol>
+</nav>
+
+<!-- Table of contents -->
+<nav aria-label="Table of contents">
+  <h2>Contents</h2>
+  <ul>
+    <li><a href="#intro">Introduction</a></li>
+    <li><a href="#methods">Methods</a></li>
+    <li><a href="#results">Results</a></li>
+  </ul>
+</nav>`
+            },
+            figure: {
+                name: '<figure>',
+                description: 'Represents self-contained content with an optional caption, such as images, diagrams, or code snippets.',
+                meta: ['Flow Content', 'Block-level', 'HTML5'],
+                usage: 'Use <figure> to wrap images, charts, code blocks, or other content that could be moved to an appendix without affecting the main flow.',
+                bestPractices: [
+                    'Use with figcaption for accessible captions',
+                    'Content should be self-contained',
+                    'Perfect for images, charts, and code examples',
+                    'Can be moved without breaking text flow'
+                ],
+                accessibility: 'Figure elements help screen readers understand relationships between content and captions, providing better context for images and other media.',
+                htmlCode: `<figure>
+  <img src="chart.png" alt="Sales growth over time">
+  <figcaption>
+    Sales have increased 300% over the past year, 
+    showing strong market adoption.
+  </figcaption>
+</figure>`,
+                visualDemo: `<div class="semantic-outline" style="border-color: #e91e63; color: #e91e63;" data-tag="figure">
+                    <div style="background: #f5f5f5; padding: 2rem; text-align: center; border-radius: 4px; margin-bottom: 0.5rem; color: #333;">
+                        📊 [Sales Chart Image]
+                    </div>
+                    <figcaption style="font-style: italic; color: var(--text-secondary); text-align: center;">
+                        Sales have increased 300% over the past year, showing strong market adoption.
+                    </figcaption>
+                </div>`,
+                examples: `<!-- Image with caption -->
+<figure>
+  <img src="team-photo.jpg" alt="Our development team">
+  <figcaption>The TechCorp development team at our 2024 retreat</figcaption>
+</figure>
+
+<!-- Code example -->
+<figure>
+  <pre><code>
+function calculateTotal(items) {
+  return items.reduce((sum, item) => sum + item.price, 0);
+}
+  </code></pre>
+  <figcaption>Function to calculate total price of items</figcaption>
+</figure>
+
+<!-- Quote -->
+<figure>
+  <blockquote>
+    "The best way to predict the future is to invent it."
+  </blockquote>
+  <figcaption>— Alan Kay</figcaption>
+</figure>`
+            },
+            time: {
+                name: '<time>',
+                description: 'Represents a specific period in time or a duration. Provides machine-readable timestamps.',
+                meta: ['Inline Content', 'HTML5', 'Semantic'],
+                usage: 'Use <time> to mark up dates, times, or durations in a machine-readable format using the datetime attribute.',
+                bestPractices: [
+                    'Always include datetime attribute',
+                    'Use ISO 8601 format for datetime values',
+                    'Great for publication dates and event times',
+                    'Helps with SEO and structured data'
+                ],
+                accessibility: 'Time elements help assistive technologies and search engines understand temporal information, making content more accessible and discoverable.',
+                htmlCode: `<article>
+  <h2>New Product Launch</h2>
+  <p>Published on <time datetime="2024-03-15T10:30:00">
+    March 15, 2024 at 10:30 AM
+  </time></p>
+  <p>Event starts in <time datetime="PT2H30M">
+    2 hours and 30 minutes
+  </time></p>
+</article>`,
+                visualDemo: `<div class="semantic-outline" style="border-color: #4caf50; color: #4caf50;" data-tag="time">
+                    <h3>New Product Launch</h3>
+                    <p>Published on <strong style="background: rgba(76, 175, 80, 0.2); padding: 0.2rem 0.4rem; border-radius: 4px;">March 15, 2024 at 10:30 AM</strong></p>
+                    <p>Event starts in <strong style="background: rgba(76, 175, 80, 0.2); padding: 0.2rem 0.4rem; border-radius: 4px;">2 hours and 30 minutes</strong></p>
+                </div>`,
+                examples: `<!-- Blog post date -->
+<article>
+  <h1>Understanding Web Components</h1>
+  <p>Published <time datetime="2024-01-15">January 15, 2024</time></p>
+</article>
+
+<!-- Event scheduling -->
+<p>The conference runs from 
+  <time datetime="2024-06-01">June 1st</time> to 
+  <time datetime="2024-06-03">June 3rd, 2024</time>
+</p>
+
+<!-- Duration -->
+<p>The movie is <time datetime="PT2H30M">2 hours and 30 minutes</time> long.</p>
+
+<!-- Specific time -->
+<p>The meeting starts at <time datetime="2024-03-20T14:00:00-05:00">
+  2:00 PM EST on March 20th
+</time></p>`
+            }
+        };
+
+        // Initialize the application
+        let currentTag = 'section';
+        let currentTab = 'demo';
+
+        function initializeApp() {
+            setupEventListeners();
+            loadTagContent(currentTag);
+        }
+
+        function setupEventListeners() {
+            // Tag selection
+            document.querySelectorAll('.tag-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const tag = e.target.dataset.tag;
+                    selectTag(tag);
+                });
+            });
+
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const tabName = e.target.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+
+            // Search functionality
+            document.getElementById('searchBox').addEventListener('input', (e) => {
+                filterTags(e.target.value);
+            });
+        }
+
+        function selectTag(tag) {
+            // Update active tag
+            document.querySelectorAll('.tag-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-tag="${tag}"]`).classList.add('active');
+
+            currentTag = tag;
+            loadTagContent(tag);
+        }
+
+        function loadTagContent(tag) {
+            const data = tagData[tag];
+            if (!data) return;
+
+            // Update header
+            document.getElementById('tagName').textContent = data.name;
+            document.getElementById('tagDescription').textContent = data.description;
+            
+            // Update meta badges
+            const metaContainer = document.getElementById('tagMeta');
+            metaContainer.innerHTML = data.meta.map(meta => 
+                `<span class="meta-badge">${meta}</span>`
+            ).join('');
+
+            // Update tab contents
+            updateDemoTab(data);
+            updateUsageTab(data);
+            updateAccessibilityTab(data);
+            updateExamplesTab(data);
+        }
+
+        function updateDemoTab(data) {
+            document.getElementById('htmlCode').innerHTML = escapeHtml(data.htmlCode);
+            document.getElementById('visualDemo').innerHTML = data.visualDemo;
+        }
+
+        function updateUsageTab(data) {
+            document.getElementById('usageText').textContent = data.usage;
+            
+            const practicesList = document.getElementById('bestPracticesList');
+            practicesList.innerHTML = data.bestPractices.map(practice => 
+                `<li>${practice}</li>`
+            ).join('');
+        }
+
+        function updateAccessibilityTab(data) {
+            document.getElementById('accessibilityContent').innerHTML = `
+                <p>${data.accessibility}</p>
+                <ul>
+                    <li>Creates landmark regions for screen readers</li>
+                    <li>Enables skip navigation functionality</li>
+                    <li>Improves content organization for users with cognitive disabilities</li>
+                    <li>Supports ARIA roles and properties</li>
+                </ul>
+            `;
+        }
+
+        function updateExamplesTab(data) {
+            document.getElementById('examplesContent').innerHTML = `
+                <div class="code-block" data-lang="HTML">${escapeHtml(data.examples)}</div>
+            `;
+        }
+
+        function switchTab(tabName) {
+            // Update active tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Update active content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+
+            currentTab = tabName;
+        }
+
+        function filterTags(searchTerm) {
+            const term = searchTerm.toLowerCase();
+            document.querySelectorAll('.tag-item').forEach(item => {
+                const tagName = item.dataset.tag.toLowerCase();
+                const isVisible = tagName.includes(term) || term === '';
+                item.style.display = isVisible ? 'block' : 'none';
+            });
+        }
+
+        function copyCode(elementId) {
+            const codeElement = document.getElementById(elementId);
+            const text = codeElement.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = codeElement.nextElementSibling;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied! ✓';
+                btn.style.background = '#34a853';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        // Add some interactive enhancements
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add smooth scrolling for better UX
+            document.documentElement.style.scrollBehavior = 'smooth';
+
+            // Add keyboard navigation support
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    const items = Array.from(document.querySelectorAll('.tag-item:not([style*="none"])'));
+                    const current = items.findIndex(item => item.classList.contains('active'));
+                    
+                    if (current !== -1) {
+                        const next = e.key === 'ArrowDown' 
+                            ? (current + 1) % items.length
+                            : (current - 1 + items.length) % items.length;
+                        
+                        items[next].click();
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            // Add visual feedback for interactions
+            document.querySelectorAll('.tag-item, .tab, .copy-btn').forEach(element => {
+                element.addEventListener('mousedown', () => {
+                    element.style.transform = 'scale(0.98)';
+                });
+                
+                element.addEventListener('mouseup', () => {
+                    element.style.transform = '';
+                });
+            });
+
+            // Animate elements on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationDelay = '0.2s';
+                        entry.target.style.animation = 'fadeIn 0.6s ease forwards';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.feature-card').forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>
