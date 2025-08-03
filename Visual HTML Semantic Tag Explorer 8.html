@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual HTML Semantic Tag Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #007AFF;
+            --secondary: #5856D6;
+            --success: #34C759;
+            --warning: #FF9500;
+            --error: #FF3B30;
+            --background: #F2F2F7;
+            --surface: #FFFFFF;
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --border: #D1D1D6;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --gradient: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background: #000000;
+                --surface: #1C1C1E;
+                --text-primary: #FFFFFF;
+                --text-secondary: #8E8E93;
+                --border: #38383A;
+                --shadow: rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: var(--gradient);
+            padding: 2rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="70" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-100px); }
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            min-height: calc(100vh - 200px);
+        }
+
+        .sidebar {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px var(--shadow);
+            backdrop-filter: blur(20px);
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--background);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .tag-filter {
+            margin-bottom: 1rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .tag-list {
+            list-style: none;
+        }
+
+        .tag-item {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: var(--background);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .tag-item:hover::before {
+            left: 100%;
+        }
+
+        .tag-item:hover {
+            transform: translateX(8px);
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .tag-item.active {
+            background: var(--primary);
+            color: white;
+            transform: translateX(8px) scale(1.02);
+        }
+
+        .tag-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .tag-category {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        .main-content {
+            background: var(--surface);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px var(--shadow);
+            backdrop-filter: blur(20px);
+        }
+
+        .content-header {
+            padding: 2rem;
+            background: var(--gradient);
+            color: white;
+            position: relative;
+        }
+
+        .content-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .content-category {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            background: var(--surface);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+
+        .tab-content {
+            padding: 2rem;
+            min-height: 500px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .visual-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .demo-section {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid var(--border);
+        }
+
+        .demo-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .code-preview {
+            background: #1a1a1a;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .code-preview::before {
+            content: 'HTML';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .visual-preview {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 150px;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0, 122, 255, 0.05) 10px,
+                rgba(0, 122, 255, 0.05) 20px
+            );
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visual-preview::before {
+            content: 'Visual Preview';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 10px;
+            background: var(--success);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .semantic-element {
+            border: 2px solid;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .semantic-element:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .element-label {
+            position: absolute;
+            top: -10px;
+            left: 12px;
+            background: var(--surface);
+            padding: 0 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .attributes-list {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .attribute-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .attribute-item:last-child {
+            border-bottom: none;
+        }
+
+        .attribute-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .attribute-value {
+            font-family: 'SF Mono', Monaco, monospace;
+            background: var(--surface);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .usage-examples {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .example-card {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .example-card:hover {
+            transform: translateX(8px);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .example-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .best-practices {
+            background: linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%);
+            border: 1px solid rgba(52, 199, 89, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .best-practices h4 {
+            color: var(--success);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .best-practices ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .best-practices li {
+            padding: 0.5rem 0;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .best-practices li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .accessibility-info {
+            background: linear-gradient(135deg, rgba(88, 86, 214, 0.1) 0%, rgba(88, 86, 214, 0.05) 100%);
+            border: 1px solid rgba(88, 86, 214, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .accessibility-info h4 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent);
+            opacity: 0.1;
+            animation: floatUpDown 6s ease-in-out infinite;
+        }
+
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: var(--background);
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+
+            .visual-demo {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .code-preview:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: var(--surface);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-circle" style="width: 100px; height: 100px; top: 10%; left: 10%; animation-delay: 0s;"></div>
+        <div class="floating-circle" style="width: 150px; height: 150px; top: 60%; right: 10%; animation-delay: 2s;"></div>
+        <div class="floating-circle" style="width: 80px; height: 80px; bottom: 20%; left: 20%; animation-delay: 4s;"></div>
+    </div>
+
+    <header class="header">
+        <h1>Visual HTML Semantic Tag Explorer</h1>
+        <p>Master semantic HTML with interactive demos and real-time code visualization</p>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Search semantic tags..." id="searchInput">
+            </div>
+
+            <div class="tag-filter">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-category="all">All</button>
+                    <button class="filter-btn" data-category="structure">Structure</button>
+                    <button class="filter-btn" data-category="content">Content</button>
+                    <button class="filter-btn" data-category="form">Form</button>
+                </div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-number">25+</span>
+                    <span class="stat-label">Tags</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Semantic</span>
+                </div>
+            </div>
+
+            <ul class="tag-list" id="tagList">
+                <!-- Tags will be populated by JavaScript -->
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h2 class="content-title" id="contentTitle">Select a Semantic Tag</h2>
+                <p class="content-category" id="contentCategory">Choose from the sidebar to explore</p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="overview">Overview</button>
+                <button class="tab" data-tab="demo">Live Demo</button>
+                <button class="tab" data-tab="examples">Examples</button>
+                <button class="tab" data-tab="accessibility">Accessibility</button>
+            </div>
+
+            <div class="tab-content" id="tabContent">
+                <div class="overview-content">
+                    <h3>Welcome to the Semantic HTML Explorer</h3>
+                    <p class="description">
+                        Semantic HTML elements provide meaning to your web content, making it more accessible, 
+                        SEO-friendly, and maintainable. Select a tag from the sidebar to see interactive demos, 
+                        code examples, and best practices.
+                    </p>
+                    
+                    <div class="stats-bar">
+                        <div class="stat-item">
+                            <span class="stat-number">🎯</span>
+                            <span class="stat-label">Better SEO</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">♿</span>
+                            <span class="stat-label">Accessibility</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">🔧</span>
+                            <span class="stat-label">Maintainable</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const semanticTags = {
+            'header': {
+                category: 'structure',
+                description: 'Represents introductory content, typically a group of introductory or navigational aids.',
+                code: `<header>
+    <h1>Website Title</h1>
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+        </ul>
+    </nav>
+</header>`,
+                demo: '<header style="border-color: #007AFF; background: rgba(0,122,255,0.1);"><div class="element-label" style="color: #007AFF;">header</div><h3>Site Header</h3><p>Navigation and branding content</p></header>',
+                attributes: ['role', 'aria-label'],
+                examples: [
+                    { title: 'Main Site Header', description: 'Contains site logo, navigation, and search' },
+                    { title: 'Article Header', description: 'Article title, author, and publication date' },
+                    { title: 'Section Header', description: 'Section title and introductory content' }
+                ],
+                bestPractices: [
+                    'Use only one main header per page',
+                    'Include primary navigation elements',
+                    'Make it visually distinct from other content',
+                    'Ensure it\'s accessible with proper heading hierarchy'
+                ],
+                accessibility: {
+                    role: 'banner (when used as main header)',
+                    screenReader: 'Announced as header landmark',
+                    keyboard: 'Focus should move logically through navigation items'
+                }
+            },
+            'nav': {
+                category: 'structure',
+                description: 'Represents a section of navigation links to other pages or parts within the page.',
+                code: `<nav aria-label="Main navigation">
+    <ul>
+        <li><a href="/home">Home</a></li>
+        <li><a href="/products">Products</a></li>
+        <li><a href="/contact">Contact</a></li>
+    </ul>
+</nav>`,
+                demo: '<nav style="border-color: #5856D6; background: rgba(88,86,214,0.1);"><div class="element-label" style="color: #5856D6;">nav</div><ul style="list-style: none; display: flex; gap: 1rem;"><li><a href="#" style="color: #5856D6;">Home</a></li><li><a href="#" style="color: #5856D6;">About</a></li><li><a href="#" style="color: #5856D6;">Contact</a></li></ul></nav>',
+                attributes: ['aria-label', 'aria-labelledby', 'role'],
+                examples: [
+                    { title: 'Primary Navigation', description: 'Main site navigation in header' },
+                    { title: 'Breadcrumb Navigation', description: 'Shows current page location' },
+                    { title: 'Pagination Navigation', description: 'Previous/next page controls' }
+                ],
+                bestPractices: [
+                    'Use aria-label to describe navigation purpose',
+                    'Include skip links for accessibility',
+                    'Mark current page with aria-current="page"',
+                    'Use semantic list structure (ul/ol with li)'
+                ],
+                accessibility: {
+                    role: 'navigation',
+                    screenReader: 'Announced as navigation landmark',
+                    keyboard: 'All links must be keyboard accessible'
+                }
+            },
+            'main': {
+                category: 'structure',
+                description: 'Represents the main content of the document. There should be only one main element per page.',
+                code: `<main>
+    <h1>Page Title</h1>
+    <article>
+        <h2>Article Title</h2>
+        <p>Main article content...</p>
+    </article>
+</main>`,
+                demo: '<main style="border-color: #34C759; background: rgba(52,199,89,0.1);"><div class="element-label" style="color: #34C759;">main</div><h3>Main Content Area</h3><p>Primary page content goes here</p></main>',
+                attributes: ['role'],
+                examples: [
+                    { title: 'Blog Post Content', description: 'Article text, images, and related content' },
+                    { title: 'Product Details', description: 'Product information and specifications' },
+                    { title: 'Form Container', description: 'Main form content and instructions' }
+                ],
+                bestPractices: [
+                    'Use only one main element per page',
+                    'Place after header and nav elements',
+                    'Should not be inside article, aside, footer, header, or nav',
+                    'Contains the unique content of the page'
+                ],
+                accessibility: {
+                    role: 'main',
+                    screenReader: 'Announced as main landmark',
+                    keyboard: 'Skip links should target main content'
+                }
+            },
+            'article': {
+                category: 'content',
+                description: 'Represents a standalone piece of content that could be distributed independently.',
+                code: `<article>
+    <header>
+        <h2>Article Title</h2>
+        <time datetime="2024-01-15">January 15, 2024</time>
+    </header>
+    <p>Article content that makes sense on its own...</p>
+    <footer>
+        <p>Tags: <a href="#html">HTML</a>, <a href="#semantic">Semantic</a></p>
+    </footer>
+</article>`,
+                demo: '<article style="border-color: #FF9500; background: rgba(255,149,0,0.1);"><div class="element-label" style="color: #FF9500;">article</div><h4>Blog Post Title</h4><p><small>Published: Jan 15, 2024</small></p><p>This is a complete, standalone article...</p></article>',
+                attributes: ['itemscope', 'itemtype'],
+                examples: [
+                    { title: 'Blog Post', description: 'Complete blog article with title, content, and metadata' },
+                    { title: 'News Article', description: 'News story with headline, byline, and body' },
+                    { title: 'Forum Post', description: 'User post in a discussion forum' }
+                ],
+                bestPractices: [
+                    'Should make sense when taken out of context',
+                    'Include proper heading hierarchy',
+                    'Use time element for publication dates',
+                    'Can be nested for comments or related articles'
+                ],
+                accessibility: {
+                    role: 'article',
+                    screenReader: 'Announced as article landmark',
+                    keyboard: 'Heading should be focusable for navigation'
+                }
+            },
+            'section': {
+                category: 'content',
+                description: 'Represents a thematic grouping of content, typically with a heading.',
+                code: `<section>
+    <h2>Features</h2>
+    <article>
+        <h3>Feature 1</h3>
+        <p>Description of first feature...</p>
+    </article>
+    <article>
+        <h3>Feature 2</h3>
+        <p>Description of second feature...</p>
+    </article>
+</section>`,
+                demo: '<section style="border-color: #FF3B30; background: rgba(255,59,48,0.1);"><div class="element-label" style="color: #FF3B30;">section</div><h4>Product Features</h4><div style="display: grid; gap: 0.5rem;"><div style="padding: 0.5rem; background: rgba(255,255,255,0.5); border-radius: 4px;">Feature 1</div><div style="padding: 0.5rem; background: rgba(255,255,255,0.5); border-radius: 4px;">Feature 2</div></div></section>',
+                attributes: ['aria-labelledby', 'aria-describedby'],
+                examples: [
+                    { title: 'Product Features', description: 'Group of related feature descriptions' },
+                    { title: 'Chapter Content', description: 'Section of a longer document' },
+                    { title: 'Testimonials', description: 'Collection of customer reviews' }
+                ],
+                bestPractices: [
+                    'Always include a heading (h1-h6)',
+                    'Use when content has a clear theme',
+                    'Avoid for styling purposes only',
+                    'Consider if article would be more appropriate'
+                ],
+                accessibility: {
+                    role: 'region (when labeled)',
+                    screenReader: 'Announced as region when labeled',
+                    keyboard: 'Heading provides navigation landmark'
+                }
+            },
+            'aside': {
+                category: 'content',
+                description: 'Represents content aside from the main content, like sidebars, pull quotes, or advertisements.',
+                code: `<aside>
+    <h3>Related Articles</h3>
+    <ul>
+        <li><a href="#article1">How to Write Semantic HTML</a></li>
+        <li><a href="#article2">CSS Grid Layout Guide</a></li>
+        <li><a href="#article3">Web Accessibility Basics</a></li>
+    </ul>
+</aside>`,
+                demo: '<aside style="border-color: #AF52DE; background: rgba(175,82,222,0.1);"><div class="element-label" style="color: #AF52DE;">aside</div><h4>Related Links</h4><ul style="list-style: none; padding: 0;"><li style="padding: 0.25rem 0;"><a href="#" style="color: #AF52DE;">Related Article 1</a></li><li style="padding: 0.25rem 0;"><a href="#" style="color: #AF52DE;">Related Article 2</a></li></ul></aside>',
+                attributes: ['aria-label', 'aria-labelledby'],
+                examples: [
+                    { title: 'Sidebar Content', description: 'Related links, ads, or secondary navigation' },
+                    { title: 'Pull Quote', description: 'Highlighted quote from main content' },
+                    { title: 'Author Bio', description: 'Information about the article author' }
+                ],
+                bestPractices: [
+                    'Use for tangentially related content',
+                    'Should be removable without affecting main content',
+                    'Include appropriate headings',
+                    'Consider screen reader users when positioning'
+                ],
+                accessibility: {
+                    role: 'complementary',
+                    screenReader: 'Announced as complementary landmark',
+                    keyboard: 'Links should be keyboard accessible'
+                }
+            },
+            'footer': {
+                category: 'structure',
+                description: 'Represents footer content for its nearest sectioning content or sectioning root element.',
+                code: `<footer>
+    <div class="footer-content">
+        <nav aria-label="Footer navigation">
+            <ul>
+                <li><a href="/privacy">Privacy Policy</a></li>
+                <li><a href="/terms">Terms of Service</a></li>
+                <li><a href="/contact">Contact Us</a></li>
+            </ul>
+        </nav>
+        <p>&copy; 2024 Company Name. All rights reserved.</p>
+    </div>
+</footer>`,
+                demo: '<footer style="border-color: #8E8E93; background: rgba(142,142,147,0.1);"><div class="element-label" style="color: #8E8E93;">footer</div><p style="margin: 0; font-size: 0.9rem;">© 2024 Company Name</p><nav style="margin-top: 0.5rem;"><a href="#" style="color: #8E8E93; margin-right: 1rem; font-size: 0.8rem;">Privacy</a><a href="#" style="color: #8E8E93; font-size: 0.8rem;">Terms</a></nav></footer>',
+                attributes: ['role'],
+                examples: [
+                    { title: 'Site Footer', description: 'Copyright, links, and contact information' },
+                    { title: 'Article Footer', description: 'Author info, publication date, tags' },
+                    { title: 'Section Footer', description: 'Summary or conclusion for a section' }
+                ],
+                bestPractices: [
+                    'Include copyright and legal information',
+                    'Provide secondary navigation links',
+                    'Keep content concise and organized',
+                    'Ensure links are accessible'
+                ],
+                accessibility: {
+                    role: 'contentinfo (when used as page footer)',
+                    screenReader: 'Announced as contentinfo landmark',
+                    keyboard: 'All interactive elements must be focusable'
+                }
+            },
+            'figure': {
+                category: 'content',
+                description: 'Represents self-contained content, often with a caption, referenced as a single unit.',
+                code: `<figure>
+    <img src="chart.png" alt="Sales growth chart showing 25% increase">
+    <figcaption>
+        Figure 1: Sales increased by 25% in Q4 2024
+    </figcaption>
+</figure>`,
+                demo: '<figure style="border-color: #007AFF; background: rgba(0,122,255,0.1); text-align: center;"><div class="element-label" style="color: #007AFF;">figure</div><div style="width: 100px; height: 60px; background: #DDD; margin: 0 auto 0.5rem; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">Image</div><figcaption style="font-size: 0.9rem; font-style: italic;">Figure 1: Example chart</figcaption></figure>',
+                attributes: ['role'],
+                examples: [
+                    { title: 'Image with Caption', description: 'Photo or illustration with descriptive caption' },
+                    { title: 'Code Snippet', description: 'Code example with explanation' },
+                    { title: 'Chart or Graph', description: 'Data visualization with description' }
+                ],
+                bestPractices: [
+                    'Use figcaption for captions',
+                    'Ensure content is self-contained',
+                    'Reference figures in main text',
+                    'Provide meaningful alt text for images'
+                ],
+                accessibility: {
+                    role: 'figure',
+                    screenReader: 'Caption is read with the figure',
+                    keyboard: 'Interactive content must be focusable'
+                }
+            },
+            'time': {
+                category: 'content',
+                description: 'Represents a specific period in time or a precise date in the Gregorian calendar.',
+                code: `<article>
+    <h2>Breaking News</h2>
+    <p>Published on <time datetime="2024-07-26T14:30:00">July 26, 2024 at 2:30 PM</time></p>
+    <p>The event occurred <time datetime="2024-07-25">yesterday</time>.</p>
+</article>`,
+                demo: '<div style="border-color: #34C759; background: rgba(52,199,89,0.1); padding: 1rem; border-radius: 8px;"><div class="element-label" style="color: #34C759;">time</div><p>Published: <time style="color: #34C759; font-weight: 600;" datetime="2024-07-26">July 26, 2024</time></p><p>Updated: <time style="color: #34C759; font-weight: 600;" datetime="2024-07-26T15:30">3:30 PM today</time></p></div>',
+                attributes: ['datetime'],
+                examples: [
+                    { title: 'Publication Date', description: 'When an article was published' },
+                    { title: 'Event Time', description: 'Specific time for an event' },
+                    { title: 'Relative Time', description: 'Human-readable time with machine-readable datetime' }
+                ],
+                bestPractices: [
+                    'Always use datetime attribute for machine readability',
+                    'Use ISO 8601 format for datetime values',
+                    'Provide human-readable text content',
+                    'Include timezone information when relevant'
+                ],
+                accessibility: {
+                    role: 'time',
+                    screenReader: 'Datetime attribute provides precise timing',
+                    keyboard: 'No specific keyboard requirements'
+                }
+            },
+            'mark': {
+                category: 'content',
+                description: 'Represents text which is highlighted for reference or notation purposes.',
+                code: `<p>Please review the <mark>highlighted sections</mark> before the meeting.</p>
+<p>Search results for "semantic HTML": 
+   <mark>Semantic HTML</mark> provides meaning to web content.
+</p>`,
+                demo: '<div style="border-color: #FF9500; background: rgba(255,149,0,0.1); padding: 1rem; border-radius: 8px;"><div class="element-label" style="color: #FF9500;">mark</div><p>The <mark style="background: #FF9500; color: white; padding: 2px 4px; border-radius: 3px;">highlighted text</mark> stands out from the rest.</p></div>',
+                attributes: [],
+                examples: [
+                    { title: 'Search Results', description: 'Highlighting search terms in results' },
+                    { title: 'Important Notes', description: 'Drawing attention to key information' },
+                    { title: 'Text References', description: 'Marking referenced text in quotes' }
+                ],
+                bestPractices: [
+                    'Use for highlighting, not just styling',
+                    'Ensure sufficient color contrast',
+                    'Don\'t overuse - reduces effectiveness',
+                    'Consider users with color vision deficiencies'
+                ],
+                accessibility: {
+                    role: 'mark',
+                    screenReader: 'May announce highlighted content differently',
+                    keyboard: 'No specific keyboard requirements'
+                }
+            },
+            'details': {
+                category: 'content',
+                description: 'Creates a disclosure widget in which information is visible only when toggled open.',
+                code: `<details>
+    <summary>System Requirements</summary>
+    <ul>
+        <li>Operating System: Windows 10 or macOS 10.15+</li>
+        <li>Memory: 8GB RAM minimum</li>
+        <li>Storage: 2GB available space</li>
+    </ul>
+</details>`,
+                demo: '<details style="border-color: #5856D6; background: rgba(88,86,214,0.1); padding: 1rem; border-radius: 8px;"><div class="element-label" style="color: #5856D6;">details</div><summary style="color: #5856D6; font-weight: 600; cursor: pointer; margin-bottom: 0.5rem;">Click to expand</summary><p style="margin: 0;">Hidden content that can be toggled visible.</p></details>',
+                attributes: ['open'],
+                examples: [
+                    { title: 'FAQ Section', description: 'Collapsible frequently asked questions' },
+                    { title: 'System Requirements', description: 'Expandable technical specifications' },
+                    { title: 'Terms and Conditions', description: 'Collapsible legal text' }
+                ],
+                bestPractices: [
+                    'Use summary element for the toggle label',
+                    'Keep summary text descriptive and clear',
+                    'Don\'t nest interactive elements in summary',
+                    'Consider keyboard navigation'
+                ],
+                accessibility: {
+                    role: 'group',
+                    screenReader: 'Summary is announced as button',
+                    keyboard: 'Space/Enter toggles open/closed state'
+                }
+            },
+            'dialog': {
+                category: 'content',
+                description: 'Represents a dialog box or other interactive component, such as a modal or alert.',
+                code: `<dialog id="confirmDialog">
+    <form method="dialog">
+        <h3>Confirm Action</h3>
+        <p>Are you sure you want to delete this item?</p>
+        <div>
+            <button value="cancel">Cancel</button>
+            <button value="confirm">Confirm</button>
+        </div>
+    </form>
+</dialog>`,
+                demo: '<div style="border-color: #FF3B30; background: rgba(255,59,48,0.1); padding: 1rem; border-radius: 8px; position: relative;"><div class="element-label" style="color: #FF3B30;">dialog</div><div style="background: white; border: 2px solid #FF3B30; border-radius: 8px; padding: 1rem; text-align: center;"><h4 style="margin: 0 0 0.5rem 0; color: #FF3B30;">Modal Dialog</h4><p style="margin: 0 0 1rem 0; font-size: 0.9rem;">Interactive dialog content</p><div><button style="margin-right: 0.5rem; padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid #ccc;">Cancel</button><button style="padding: 0.25rem 0.5rem; border-radius: 4px; background: #FF3B30; color: white; border: none;">OK</button></div></div></div>',
+                attributes: ['open', 'aria-label', 'aria-labelledby'],
+                examples: [
+                    { title: 'Confirmation Modal', description: 'Modal asking user to confirm an action' },
+                    { title: 'Settings Dialog', description: 'Modal for adjusting application settings' },
+                    { title: 'Login Form', description: 'Modal containing user authentication form' }
+                ],
+                bestPractices: [
+                    'Use showModal() to display as modal',
+                    'Include close button or ESC key handling',
+                    'Focus management is crucial',
+                    'Use form method="dialog" for form dialogs'
+                ],
+                accessibility: {
+                    role: 'dialog',
+                    screenReader: 'Announced as dialog, focus trapped inside',
+                    keyboard: 'ESC closes, Tab cycles through dialog content'
+                }
+            }
+        };
+
+        let currentTag = null;
+        let currentTab = 'overview';
+        let filteredTags = semanticTags;
+
+        // DOM Elements
+        const tagList = document.getElementById('tagList');
+        const contentTitle = document.getElementById('contentTitle');
+        const contentCategory = document.getElementById('contentCategory');
+        const tabContent = document.getElementById('tabContent');
+        const searchInput = document.getElementById('searchInput');
+
+        // Initialize the application
+        function init() {
+            renderTagList();
+            setupEventListeners();
+            showOverview();
+        }
+
+        // Render the tag list in sidebar
+        function renderTagList() {
+            tagList.innerHTML = '';
+            
+            Object.entries(filteredTags).forEach(([tagName, tagData]) => {
+                const li = document.createElement('li');
+                li.className = 'tag-item';
+                li.dataset.tag = tagName;
+                li.innerHTML = `
+                    <div class="tag-name">&lt;${tagName}&gt;</div>
+                    <div class="tag-category">${tagData.category}</div>
+                `;
+                li.addEventListener('click', () => selectTag(tagName));
+                tagList.appendChild(li);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search functionality
+            searchInput.addEventListener('input', handleSearch);
+            
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', handleFilter);
+            });
+            
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', handleTabChange);
+            });
+            
+            // Copy code functionality
+            document.addEventListener('click', handleCopyCode);
+        }
+
+        // Handle search input
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase();
+            filteredTags = {};
+            
+            Object.entries(semanticTags).forEach(([tagName, tagData]) => {
+                if (tagName.toLowerCase().includes(query) || 
+                    tagData.description.toLowerCase().includes(query) ||
+                    tagData.category.toLowerCase().includes(query)) {
+                    filteredTags[tagName] = tagData;
+                }
+            });
+            
+            renderTagList();
+        }
+
+        // Handle category filtering
+        function handleFilter(e) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            const category = e.target.dataset.category;
+            
+            if (category === 'all') {
+                filteredTags = semanticTags;
+            } else {
+                filteredTags = {};
+                Object.entries(semanticTags).forEach(([tagName, tagData]) => {
+                    if (tagData.category === category) {
+                        filteredTags[tagName] = tagData;
+                    }
+                });
+            }
+            
+            renderTagList();
+        }
+
+        // Handle tab changes
+        function handleTabChange(e) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            currentTab = e.target.dataset.tab;
+            if (currentTag) {
+                renderTagContent(currentTag);
+            }
+        }
+
+        // Handle code copying
+        function handleCopyCode(e) {
+            if (e.target.classList.contains('copy-btn')) {
+                const codeBlock = e.target.parentElement;
+                const code = codeBlock.textContent.replace('Copy', '').trim();
+                
+                navigator.clipboard.writeText(code).then(() => {
+                    e.target.textContent = 'Copied!';
+                    setTimeout(() => {
+                        e.target.textContent = 'Copy';
+                    }, 2000);
+                });
+            }
+        }
+
+        // Select a tag and display its content
+        function selectTag(tagName) {
+            currentTag = tagName;
+            const tagData = semanticTags[tagName];
+            
+            // Update sidebar selection
+            document.querySelectorAll('.tag-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.tag === tagName);
+            });
+            
+            // Update header
+            contentTitle.textContent = `<${tagName}>`;
+            contentCategory.textContent = `${tagData.category.charAt(0).toUpperCase() + tagData.category.slice(1)} Element`;
+            
+            renderTagContent(tagName);
+        }
+
+        // Render content based on current tab
+        function renderTagContent(tagName) {
+            const tagData = semanticTags[tagName];
+            let content = '';
+            
+            switch (currentTab) {
+                case 'overview':
+                    content = renderOverview(tagData);
+                    break;
+                case 'demo':
+                    content = renderDemo(tagName, tagData);
+                    break;
+                case 'examples':
+                    content = renderExamples(tagData);
+                    break;
+                case 'accessibility':
+                    content = renderAccessibility(tagData);
+                    break;
+            }
+            
+            tabContent.innerHTML = content;
+        }
+
+        // Render overview tab
+        function renderOverview(tagData) {
+            return `
+                <div class="description">
+                    ${tagData.description}
+                </div>
+                
+                <div class="attributes-list">
+                    <h4>Common Attributes</h4>
+                    ${tagData.attributes.length > 0 ? 
+                        tagData.attributes.map(attr => `
+                            <div class="attribute-item">
+                                <span class="attribute-name">${attr}</span>
+                                <span class="attribute-value tooltip" data-tooltip="Global HTML attribute">${attr}</span>
+                            </div>
+                        `).join('') : 
+                        '<p>Uses standard global HTML attributes</p>'
+                    }
+                </div>
+                
+                <div class="best-practices">
+                    <h4>✅ Best Practices</h4>
+                    <ul>
+                        ${tagData.bestPractices.map(practice => `<li>${practice}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Render demo tab
+        function renderDemo(tagName, tagData) {
+            return `
+                <div class="visual-demo">
+                    <div class="demo-section">
+                        <div class="demo-title">HTML Code</div>
+                        <div class="code-preview">
+                            <button class="copy-btn">Copy</button>
+                            ${escapeHtml(tagData.code)}
+                        </div>
+                    </div>
+                    
+                    <div class="demo-section">
+                        <div class="demo-title">Visual Result</div>
+                        <div class="visual-preview">
+                            ${tagData.demo}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="description">
+                    <strong>Interactive Demo:</strong> The visual preview shows how the <code>&lt;${tagName}&gt;</code> 
+                    element appears and behaves in the browser. Notice how semantic elements provide 
+                    structure and meaning beyond just visual presentation.
+                </div>
+            `;
+        }
+
+        // Render examples tab
+        function renderExamples(tagData) {
+            return `
+                <div class="usage-examples">
+                    ${tagData.examples.map(example => `
+                        <div class="example-card">
+                            <div class="example-title">${example.title}</div>
+                            <p>${example.description}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="best-practices">
+                    <h4>💡 Usage Tips</h4>
+                    <ul>
+                        <li>Consider the semantic meaning, not just visual appearance</li>
+                        <li>Think about how screen readers will interpret the content</li>
+                        <li>Use appropriate heading hierarchy within semantic elements</li>
+                        <li>Test with keyboard navigation and assistive technologies</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Render accessibility tab
+        function renderAccessibility(tagData) {
+            return `
+                <div class="accessibility-info">
+                    <h4>♿ Accessibility Information</h4>
+                    <div class="attribute-item">
+                        <span class="attribute-name">ARIA Role</span>
+                        <span class="attribute-value">${tagData.accessibility.role}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-name">Screen Reader</span>
+                        <span class="attribute-value">${tagData.accessibility.screenReader}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-name">Keyboard Support</span>
+                        <span class="attribute-value">${tagData.accessibility.keyboard}</span>
+                    </div>
+                </div>
+                
+                <div class="best-practices">
+                    <h4>🎯 Accessibility Best Practices</h4>
+                    <ul>
+                        <li>Use semantic HTML as the foundation for accessibility</li>
+                        <li>Provide proper labels and descriptions with ARIA when needed</li>
+                        <li>Ensure keyboard accessibility for all interactive elements</li>
+                        <li>Test with actual assistive technologies</li>
+                        <li>Maintain sufficient color contrast ratios</li>
+                        <li>Provide alternative text for images and media</li>
+                    </ul>
+                </div>
+                
+                <div class="description">
+                    <strong>Why Semantic HTML Matters:</strong> Semantic elements provide built-in accessibility 
+                    features that help screen readers, keyboard navigation, and other assistive technologies 
+                    understand and interact with your content effectively.
+                </div>
+            `;
+        }
+
+        // Show initial overview
+        function showOverview() {
+            tabContent.innerHTML = `
+                <div class="overview-content">
+                    <h3>🚀 Welcome to the Semantic HTML Explorer</h3>
+                    <p class="description">
+                        Semantic HTML elements provide meaning to your web content, making it more accessible, 
+                        SEO-friendly, and maintainable. Select a tag from the sidebar to see interactive demos, 
+                        code examples, and accessibility information.
+                    </p>
+                    
+                    <div class="stats-bar">
+                        <div class="stat-item">
+                            <span class="stat-number">🎯</span>
+                            <span class="stat-label">Better SEO</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">♿</span>
+                            <span class="stat-label">Accessibility</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">🔧</span>
+                            <span class="stat-label">Maintainable</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">📱</span>
+                            <span class="stat-label">Responsive</span>
+                        </div>
+                    </div>
+                    
+                    <div class="best-practices">
+                        <h4>✨ Key Benefits of Semantic HTML</h4>
+                        <ul>
+                            <li><strong>Improved SEO:</strong> Search engines better understand your content structure</li>
+                            <li><strong>Enhanced Accessibility:</strong> Screen readers can navigate content more effectively</li>
+                            <li><strong>Better Maintainability:</strong> Code is more readable and self-documenting</li>
+                            <li><strong>Future-Proof:</strong> Semantic meaning remains consistent across devices</li>
+                            <li><strong>Professional Development:</strong> Industry standard for modern web development</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="description">
+                        <strong>Getting Started:</strong> Click on any semantic tag in the sidebar to explore its 
+                        purpose, see live demos, and learn accessibility best practices. Use the search and filter 
+                        options to find specific elements quickly.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Utility function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
